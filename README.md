@@ -2,7 +2,7 @@
 
 A standalone, dependency-free WYSIWYG editor for static HTML pages — runs entirely in the browser with a single double-click. No installation, no server, no build step.
 
-Built by [Cortex AI Solutions](https://cortex-ai-solutions.de).
+Built by [Cortex AI Solutions](https://www.cortex-ai.de/).
 
 ---
 
