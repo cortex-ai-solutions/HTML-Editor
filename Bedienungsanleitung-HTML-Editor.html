@@ -455,11 +455,6 @@ ein Bestandteil der Seite, z. B. ein Textabsatz, eine Überschrift, ein Bild ode
 <!-- ═══════════════════════════════════════ -->
 <h2>8. Foto einfügen</h2>
 
-<div class="warnung">
-  ⚠️ <strong>Voraussetzung:</strong> Der Arbeitspfad muss festgelegt sein (siehe Kapitel 2).
-  Nur dann stehen die Bilder aus Ihrem Website-Ordner zur Auswahl.
-</div>
-
 <div class="schritt">
   <div class="schritt-zeile">
     <span class="nr">1</span>
@@ -477,8 +472,7 @@ ein Bestandteil der Seite, z. B. ein Textabsatz, eine Überschrift, ein Bild ode
 <div class="schritt">
   <div class="schritt-zeile">
     <span class="nr">3</span>
-    <div class="schritt-text">Wählen Sie ein Bild aus dem <strong>Dropdown-Menü</strong>. Alle Bilder aus Ihrem Website-Ordner werden dort aufgelistet.
-    Nach der Auswahl erscheint eine kleine Vorschau des Bildes.</div>
+    <div class="schritt-text">Klicken Sie auf <strong>„📷 Foto aus Dateimanager wählen …"</strong>. Es öffnet sich der normale Datei-Auswahl-Dialog Ihres Computers. Navigieren Sie zum Bild-Ordner Ihrer Website und wählen Sie das gewünschte Bild aus. Nach der Auswahl erscheint eine kleine Vorschau im Dialog.</div>
   </div>
 </div>
 
@@ -489,8 +483,8 @@ ein Bestandteil der Seite, z. B. ein Textabsatz, eine Überschrift, ein Bild ode
       <ul>
         <li><strong>Volle Breite</strong> – Bild nimmt die volle Seitenbreite ein</li>
         <li><strong>Halbe Breite</strong> – Bild nimmt die halbe Breite ein</li>
-        <li><strong>Klein</strong> – ca. 150 Pixel</li>
-        <li><strong>Mittel</strong> – ca. 300 Pixel</li>
+        <li><strong>Klein</strong> – max. 300 Pixel</li>
+        <li><strong>Mittel</strong> – max. 500 Pixel</li>
         <li><strong>Größe übernehmen</strong> – Größe des ausgewählten Elements (falls es ein Bild ist)</li>
       </ul>
     </div>
@@ -501,21 +495,22 @@ ein Bestandteil der Seite, z. B. ein Textabsatz, eine Überschrift, ein Bild ode
   <div class="schritt-zeile">
     <span class="nr">5</span>
     <div class="schritt-text">Geben Sie einen <strong>Alt-Text</strong> ein – eine kurze Beschreibung des Bildes, z. B. „Vereinstreffen im Saal".
-    Das ist wichtig für blinde Nutzer und Suchmaschinen.</div>
+    Das ist wichtig für blinde Nutzer und Suchmaschinen. Der Editor schlägt automatisch einen Text aus dem Dateinamen vor.</div>
   </div>
 </div>
 
 <div class="schritt">
   <div class="schritt-zeile">
     <span class="nr">6</span>
-    <div class="schritt-text">Klicken Sie auf <strong>Einfügen</strong>. Das Bild erscheint in der Vorschau an der gewünschten Stelle.</div>
+    <div class="schritt-text">Klicken Sie auf <strong>✔ Einfügen</strong>. Das Bild erscheint in der Vorschau an der gewünschten Stelle.</div>
   </div>
 </div>
 
 <div class="tipp">
-  💡 <strong>Relativer Pfad:</strong> Der Editor berechnet automatisch den richtigen Dateipfad zum Bild –
-  Sie müssen sich keine Pfade merken. In der gespeicherten HTML-Datei steht der korrekte relative Pfad,
-  wie er auf der echten Website benötigt wird.
+  💡 <strong>Automatischer Pfad:</strong> Wenn der Arbeitspfad festgelegt ist und das Bild aus dem Website-Ordner
+  stammt, berechnet der Editor den korrekten relativen Pfad vollautomatisch – der grüne Pfad im Dialog
+  bestätigt das. Stammt das Bild von einem anderen Ort, erscheint eine gelbe Warnung; der Pfad sollte
+  dann manuell geprüft werden.
 </div>
 
 <hr class="trennlinie">
@@ -543,7 +538,7 @@ ein Bestandteil der Seite, z. B. ein Textabsatz, eine Überschrift, ein Bild ode
 <div class="schritt">
   <div class="schritt-zeile">
     <span class="nr">3</span>
-    <div class="schritt-text">Der Foto-Dialog öffnet sich. Wählen Sie das neue Bild aus dem Dropdown, passen Sie Größe und Alt-Text an.</div>
+    <div class="schritt-text">Der Foto-Dialog öffnet sich. Klicken Sie auf <strong>„📷 Foto aus Dateimanager wählen …"</strong>, wählen Sie das neue Bild aus dem Datei-Dialog Ihres Computers, und passen Sie Größe und Alt-Text an.</div>
   </div>
 </div>
 
@@ -586,9 +581,8 @@ Seite Ihrer Website oder zu einer externen Webseite.</p>
     <span class="nr">3</span>
     <div class="schritt-text">Wählen Sie den Link-Typ:
       <ul>
-        <li><strong>Seite im Arbeitspfad</strong>: Wählen Sie eine HTML-Datei aus Ihrem Website-Ordner aus dem Dropdown.
-        Der korrekte relative Pfad wird automatisch berechnet.</li>
-        <li><strong>Eigene URL</strong>: Geben Sie eine vollständige Webadresse ein, z. B. <em>https://www.example.de</em>.
+        <li><strong>📄 Seite im Arbeitspfad</strong>: Klicken Sie auf „📄 Seite aus Dateimanager wählen …" und wählen Sie die gewünschte HTML-Datei aus Ihrem Website-Ordner. Der korrekte relative Pfad wird automatisch berechnet und grün angezeigt.</li>
+        <li><strong>🌐 Eigene URL</strong>: Geben Sie eine vollständige Webadresse ein, z. B. <em>https://www.example.de</em>.
         Falls Sie das „https://" vergessen, wird es automatisch ergänzt.</li>
       </ul>
     </div>
@@ -606,7 +600,7 @@ Seite Ihrer Website oder zu einer externen Webseite.</p>
 <div class="schritt">
   <div class="schritt-zeile">
     <span class="nr">5</span>
-    <div class="schritt-text">Klicken Sie auf <strong>Speichern</strong>.</div>
+    <div class="schritt-text">Klicken Sie auf <strong>✔ Übernehmen</strong>.</div>
   </div>
 </div>
 
@@ -689,10 +683,11 @@ Seite Ihrer Website oder zu einer externen Webseite.</p>
 <h2>13. Häufige Fragen</h2>
 
 <h3>Die Bilder werden in der Vorschau nicht angezeigt.</h3>
-<p>Wahrscheinlich wurde der Arbeitspfad nicht festgelegt oder nach dem Arbeitspfad-Setzen
-vergessen, die Datei erneut zu öffnen. Gehen Sie so vor:
-(1) Klicken Sie auf „📁 Arbeitspfad festlegen" und wählen Sie den Website-Ordner.
-(2) Klicken Sie dann auf „📂 Öffnen" und laden Sie die HTML-Datei neu.</p>
+<p>Der Arbeitspfad wurde wahrscheinlich nicht festgelegt. Gehen Sie so vor:
+(1) Klicken Sie auf „📁 Arbeitspfad festlegen" und wählen Sie den Hauptordner Ihrer Website.
+(2) Klicken Sie dann auf „📂 Öffnen" und laden Sie die HTML-Datei neu.
+Hinweis: Das Foto-Einfügen-Dialogfenster zeigt eine <strong>gelbe Warnung</strong>, wenn ein gewähltes Bild
+nicht im Arbeitspfad gefunden wird – in diesem Fall den Arbeitspfad neu laden und erneut versuchen.</p>
 
 <h3>Das Design (CSS) sieht in der Vorschau falsch aus.</h3>
 <p>Auch hier hilft es, den Arbeitspfad zuerst festzulegen. Der Editor sucht im Website-Ordner
