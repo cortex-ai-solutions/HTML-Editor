@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML Editor</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #1a1f2e;
+      color: #e2e8f0;
+      overflow: hidden;
+    }
+
+    #titlebar {
+      background: linear-gradient(90deg, #0a1628 0%, #0f2240 50%, #1e293b 100%);
+      border-bottom: 2px solid #b8954a;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    #titlebar .tb-name { font-size: 15px; font-weight: 700; color: #e2e8f0; letter-spacing: 0.4px; }
+    #titlebar .tb-brand { font-size: 11px; color: #b8954a; letter-spacing: 0.3px; margin-top: 1px; }
+    #titlebar .tb-help {
+      margin-left: auto;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 1.5px solid #b8954a;
+      background: transparent;
+      color: #b8954a;
+      font-size: 15px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      flex-shrink: 0;
+    }
+    #titlebar .tb-help:hover { background: #b8954a; color: #0a1628; }
+
+    #toolbar {
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+
+    .sep { width: 1px; height: 26px; background: #334155; margin: 0 4px; flex-shrink: 0; }
+
+    button {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 13px;
+      padding: 6px 13px;
+      border-radius: 5px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    button:hover:not(:disabled) { background: #334155; color: #f1f5f9; border-color: #475569; }
+    button:disabled { opacity: 0.35; cursor: not-allowed; }
+    button.primary { background: #0369a1; border-color: #0284c7; color: #e0f2fe; }
+    button.primary:hover:not(:disabled) { background: #0284c7; }
+    button.danger { border-color: #7f1d1d; color: #fca5a5; }
+    button.danger:hover:not(:disabled) { background: #450a0a; }
+    button.tab { background: none; border: none; border-bottom: 3px solid transparent; border-radius: 0; padding: 6px 16px; color: #64748b; font-weight: 500; }
+    button.tab.active { color: #38bdf8; border-bottom-color: #38bdf8; }
+    button.tab:hover:not(:disabled) { background: none; color: #94a3b8; }
+    button.tab.active:hover { color: #38bdf8; }
+
+    #tabs { background: #1e293b; border-bottom: 1px solid #334155; padding: 0 12px; display: flex; flex-shrink: 0; }
+
+    #main { flex: 1; display: flex; overflow: hidden; }
+
+    .panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .panel + .panel { border-left: 2px solid #334155; }
+
+    .panel-header {
+      background: #0f172a; border-bottom: 1px solid #1e293b;
+      padding: 5px 12px; font-size: 11px; color: #475569;
+      display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+    }
+
+    iframe { flex: 1; border: none; background: white; }
+
+    textarea#code-editor {
+      flex: 1; background: #020617; color: #7dd3fc; border: none;
+      padding: 14px; font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 13px; line-height: 1.7; resize: none; outline: none; tab-size: 2;
+    }
+
+    #statusbar {
+      background: #0f172a; border-top: 1px solid #334155;
+      padding: 5px 14px; font-size: 12px; color: #64748b;
+      display: flex; align-items: center; gap: 12px; flex-shrink: 0; min-height: 28px;
+    }
+    #statusbar .sel-info { color: #38bdf8; background: #0c2340; padding: 2px 10px; border-radius: 4px; max-width: 500px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #statusbar .clip-info { color: #4ade80; }
+    #statusbar .flash-msg { color: #4ade80; font-weight: 600; }
+
+    #welcome { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 40px; text-align: center; }
+    #welcome h2 { color: #38bdf8; font-size: 22px; }
+    #welcome p { color: #64748b; max-width: 440px; line-height: 1.7; }
+    #welcome .big-btn { font-size: 16px; padding: 14px 32px; background: #0369a1; border-color: #0284c7; color: white; border-radius: 8px; }
+    #welcome .big-btn:hover { background: #0284c7; }
+    #welcome .demo-btn { font-size: 14px; padding: 10px 24px; color: #94a3b8; }
+
+    button.edit-active { background: #166534 !important; border-color: #16a34a !important; color: #bbf7d0 !important; animation: pulse-green 1.2s infinite; }
+    @keyframes pulse-green { 0%,100% { box-shadow: 0 0 0 0 rgba(22,163,74,0.4); } 50% { box-shadow: 0 0 0 5px rgba(22,163,74,0); } }
+
+    /* Foto-Dialog */
+    .dlg-label { font-size: 12px; color: #94a3b8; display: block; margin-bottom: 5px; }
+    .dlg-select, .dlg-input { width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 5px; color: #e2e8f0; padding: 7px 10px; font-size: 13px; margin-bottom: 14px; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    .dlg-result { font-family: 'Consolas', monospace; font-size: 13px; color: #4ade80; padding: 8px 10px; background: #052e16; border-radius: 4px; min-height: 32px; word-break: break-all; margin-bottom: 14px; }
+    #dlg-img-preview { max-width: 100%; max-height: 120px; display: none; border-radius: 4px; margin-bottom: 14px; border: 1px solid #334155; }
+    .dlg-file-row { display: flex; gap: 8px; margin-bottom: 14px; }
+    .dlg-file-row span { flex: 1; background: #0f172a; border: 1px solid #334155; border-radius: 5px; color: #4ade80; padding: 7px 10px; font-size: 12px; font-family: 'Consolas', monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .dlg-file-row span.empty { color: #475569; font-style: italic; }
+
+    .hidden { display: none !important; }
+
+    #infobar {
+      background: #0c1323;
+      border-bottom: 1px solid #1e293b;
+      padding: 3px 14px;
+      font-size: 11px;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+    #infobar .ib-label { color: #334155; }
+    #infobar .ib-folder { color: #38bdf8; font-family: 'Consolas', monospace; }
+    #infobar .ib-file { color: #94a3b8; font-family: 'Consolas', monospace; }
+    #infobar .ib-none { color: #334155; font-style: italic; }
+  </style>
+</head>
+<body>
+
+<div id="titlebar">
+  <!-- Cortex AI Solutions Logo -->
+  <svg width="52" height="32" viewBox="0 0 52 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+    <defs>
+      <linearGradient id="g1" x1="0" y1="0" x2="52" y2="32" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#d4aa6a"/>
+        <stop offset="100%" stop-color="#a07830"/>
+      </linearGradient>
+    </defs>
+    <path d="M 4,24 C 10,6 18,6 24,16 C 30,26 38,26 46,9"
+          stroke="url(#g1)" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="24" cy="16" r="3.2" fill="url(#g1)"/>
+    <circle cx="37" cy="23" r="3.2" fill="url(#g1)"/>
+  </svg>
+  <div style="display:flex;flex-direction:column;justify-content:center;line-height:1.25;">
+    <span class="tb-name">HTML Editor</span>
+    <span class="tb-brand">von Cortex AI Solutions</span>
+  </div>
+  <a href="Bedienungsanleitung-HTML-Editor.html" target="_blank" class="tb-help" title="Bedienungsanleitung &#246;ffnen">?</a>
+</div>
+
+<div id="toolbar">
+  <button onclick="openFolder()" id="btn-folder" title="Den Ordner Ihrer Website festlegen &#8211; damit Bilder und CSS-Stile geladen werden k&#246;nnen">&#128193; Arbeitspfad festlegen</button>
+  <button onclick="openFile()">&#128194; &#214;ffnen</button>
+  <button onclick="saveFile()" id="btn-save">&#128190; Speichern</button>
+  <button onclick="loadDemo()">&#8635; Beispiel</button>
+  <div class="sep"></div>
+  <button onclick="copyEl()" id="btn-copy" disabled>&#128203; Kopieren</button>
+  <button onclick="duplicateEl()" id="btn-dup" disabled>&#10697; Duplizieren</button>
+  <button onclick="pasteEl()" id="btn-paste" disabled>&#128204; Einf&#252;gen</button>
+  <div class="sep"></div>
+  <button onclick="moveUp()" id="btn-up" disabled>&#8593; Hoch</button>
+  <button onclick="moveDown()" id="btn-down" disabled>&#8595; Runter</button>
+  <div class="sep"></div>
+  <button onclick="deleteEl()" id="btn-del" disabled class="danger">&#128465; L&#246;schen</button>
+  <div class="sep"></div>
+  <button onclick="startEdit()" id="btn-edit" disabled class="primary">&#9999;&#65039; Text bearbeiten</button>
+  <button onclick="openLinkDialog()" id="btn-link" disabled>&#128279; Hyperlink</button>
+  <div class="sep"></div>
+  <button onclick="openPhotoDialog('after')" id="btn-photo" disabled>&#128444; Foto einf&#252;gen</button>
+  <button onclick="openPhotoDialog('replace')" id="btn-photo-replace" disabled>&#128259; Foto ersetzen</button>
+  <button onclick="openPhotoDialog('end')">&#128444; Foto ans Ende</button>
+</div>
+
+<div id="infobar">
+  <span class="ib-label">Arbeitspfad:</span><span id="ib-folder" class="ib-none">nicht festgelegt</span>
+  <span class="ib-label">&#124;</span>
+  <span class="ib-label">Datei:</span><span id="ib-file" class="ib-none">keine Datei ge&#246;ffnet</span>
+</div>
+
+<!-- Hyperlink-Dialog -->
+<div id="link-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
+  <div style="background:#1e293b; border:1px solid #38bdf8; border-radius:10px; padding:28px 32px; min-width:440px; max-width:520px; width:92%; box-shadow:0 8px 40px rgba(0,0,0,0.6);">
+    <h3 style="color:#38bdf8; margin-bottom:20px; font-size:15px;">&#128279; Hyperlink bearbeiten</h3>
+
+    <div style="display:flex; gap:6px; margin-bottom:18px;">
+      <button onclick="setLinkType('internal')" id="btn-link-int" class="primary" style="flex:1;">&#128196; Seite im Arbeitspfad</button>
+      <button onclick="setLinkType('external')" id="btn-link-ext" style="flex:1;">&#127760; Eigene URL</button>
+    </div>
+
+    <div id="link-int-section">
+      <label class="dlg-label">Zielseite ausw&#228;hlen</label>
+      <button onclick="document.getElementById('link-filepicker').click()"
+              style="width:100%;padding:11px 14px;font-size:13px;text-align:left;margin-bottom:10px;">
+        &#128196;&nbsp; Seite aus Dateimanager w&#228;hlen &hellip;
+      </button>
+      <input type="file" id="link-filepicker" accept=".html,.htm" style="display:none" onchange="onFilePickerLink(this)">
+      <div id="link-picked-display" style="display:none; background:#052e16; border:1px solid #16a34a; border-radius:5px; padding:8px 12px; font-size:12px; color:#4ade80; margin-bottom:8px; font-family:'Consolas',monospace; word-break:break-all;">
+        &#128196;&nbsp;<span id="link-picked-name"></span>
+      </div>
+      <div id="link-path-warn" style="display:none; background:#2d1515; border:1px solid #ef4444; border-radius:5px; padding:8px 12px; font-size:12px; color:#fca5a5; margin-bottom:8px;">
+        &#9888; Seite nicht im Arbeitspfad gefunden &ndash; Pfad evtl. falsch.
+        Bitte <a href="#" onclick="closeLinkDialog();openFolder();return false;" style="color:#fbbf24; text-decoration:underline;">Arbeitspfad neu laden</a> und erneut versuchen.
+      </div>
+    </div>
+
+    <div id="link-ext-section" style="display:none;">
+      <label class="dlg-label">URL eingeben</label>
+      <input id="link-url" type="text" class="dlg-input" placeholder="https://www.beispiel.de" oninput="updateLinkResult()">
+    </div>
+
+    <label class="dlg-label" style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-bottom:16px;">
+      <input type="checkbox" id="link-new-tab" style="width:15px;height:15px;cursor:pointer;flex-shrink:0;">
+      <span>In neuem Tab &#246;ffnen</span>
+    </label>
+
+    <label class="dlg-label"><strong style="color:#4ade80;">Ergebnis-Link</strong></label>
+    <div class="dlg-result" id="link-result">&#8212; bitte Link w&#228;hlen &#8212;</div>
+
+    <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:6px;">
+      <button onclick="closeLinkDialog()">Abbrechen</button>
+      <button onclick="confirmLink()" class="primary" id="btn-confirm-link" disabled>&#10003; &#220;bernehmen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Foto-Dialog -->
+<div id="photo-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
+  <div style="background:#1e293b; border:1px solid #38bdf8; border-radius:10px; padding:28px 32px; min-width:460px; max-width:560px; width:92%; box-shadow:0 8px 40px rgba(0,0,0,0.6); max-height:90vh; overflow-y:auto;">
+    <h3 style="color:#38bdf8; margin-bottom:20px; font-size:15px;">&#128444; Foto einf&#252;gen</h3>
+
+    <label class="dlg-label"><strong style="color:#fbbf24;">Foto ausw&#228;hlen</strong></label>
+    <button onclick="document.getElementById('dlg-filepicker').click()"
+            style="width:100%;padding:11px 14px;font-size:13px;text-align:left;margin-bottom:10px;">
+      &#128247;&nbsp; Foto aus Dateimanager w&#228;hlen &hellip;
+    </button>
+    <input type="file" id="dlg-filepicker" accept="image/*" style="display:none" onchange="onFilePickerImage(this)">
+    <div id="dlg-path-warn" style="display:none; background:#2d1515; border:1px solid #ef4444; border-radius:5px; padding:8px 12px; font-size:12px; color:#fca5a5; margin-bottom:10px;">
+      &#9888; Foto nicht im Arbeitspfad gefunden &ndash; relativer Pfad evtl. falsch.
+      Bitte <a href="#" onclick="closePhotoDialog();openFolder();return false;" style="color:#fbbf24; text-decoration:underline;">Arbeitspfad neu laden</a> und erneut versuchen.
+    </div>
+
+    <img id="dlg-img-preview" alt="Vorschau">
+
+    <div id="dlg-dim-row" style="display:none; margin-bottom:14px;">
+      <label class="dlg-label" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+        <input type="checkbox" id="dlg-use-dims" checked style="width:15px;height:15px;cursor:pointer;flex-shrink:0;">
+        <span>Gr&#246;&#223;e aus gew&#228;hltem Element &#252;bernehmen: <strong id="dlg-dim-label" style="color:#4ade80;"></strong></span>
+      </label>
+    </div>
+
+    <label class="dlg-label">Breite</label>
+    <select id="dlg-width" class="dlg-select">
+      <option value="max-width:100%;">Volle Breite (empfohlen)</option>
+      <option value="max-width:50%;">Halbe Breite</option>
+      <option value="max-width:300px;">Klein (max. 300px)</option>
+      <option value="max-width:500px;">Mittel (max. 500px)</option>
+      <option value="width:auto;">Gr&#246;&#223;e &#252;bernehmen</option>
+    </select>
+
+    <label class="dlg-label">Bildbeschreibung (Alt-Text)</label>
+    <input id="dlg-alt" type="text" class="dlg-input" placeholder="z.B. Lesung im Vereinsheim">
+
+    <label class="dlg-label"><strong style="color:#4ade80;">Berechneter relativer Pfad</strong></label>
+    <div class="dlg-result" id="dlg-rel-path">&#8212; bitte zuerst Bild w&#228;hlen &#8212;</div>
+
+    <div style="display:flex; gap:10px; justify-content:flex-end;">
+      <button onclick="closePhotoDialog()">Abbrechen</button>
+      <button onclick="confirmPhoto()" class="primary" id="btn-confirm-photo" disabled>&#10003; Einf&#252;gen</button>
+    </div>
+  </div>
+</div>
+
+<div id="tabs">
+  <button class="tab active" onclick="setView('split')" id="tab-split">&#11035; Geteilt</button>
+  <button class="tab" onclick="setView('preview')" id="tab-preview">&#128065; Vorschau</button>
+  <button class="tab" onclick="setView('code')" id="tab-code">&lt;/&gt; Code</button>
+</div>
+
+<div id="main">
+  <div id="welcome">
+    <h2>Willkommen beim HTML Editor</h2>
+    <p>&#214;ffnen Sie eine bestehende HTML-Datei und bearbeiten Sie sie visuell &#8211; klicken Sie Elemente an, kopieren, verschieben oder l&#246;schen Sie diese direkt.</p>
+    <button class="big-btn" onclick="openFile()">&#128194; HTML-Datei &#246;ffnen</button>
+    <button class="demo-btn" onclick="loadDemo()">oder Beispiel laden zum Ausprobieren</button>
+  </div>
+  <div class="panel hidden" id="panel-preview">
+    <div class="panel-header">
+      <span>&#128070; Einmal klicken = ausw&#228;hlen &nbsp;|&nbsp; Doppelklick = Text bearbeiten</span>
+      <span id="preview-filename" style="color:#38bdf8"></span>
+    </div>
+    <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin" title="Vorschau"></iframe>
+  </div>
+  <div class="panel hidden" id="panel-code">
+    <div class="panel-header">
+      <span>HTML Quellcode</span>
+      <button class="primary" onclick="applyCode()" style="font-size:12px;padding:3px 10px;">&#8629; &#220;bernehmen</button>
+    </div>
+    <textarea id="code-editor" spellcheck="false"></textarea>
+  </div>
+</div>
+
+<div id="statusbar">
+  <span id="status-default">Keine Datei geladen</span>
+  <span id="status-sel" class="sel-info hidden"></span>
+  <span id="status-clip" class="clip-info hidden">&#128203; Im Zwischenspeicher</span>
+  <span id="status-flash" class="flash-msg hidden"></span>
+</div>
+
+<input type="file" id="file-input" accept=".html,.htm" style="display:none" onchange="onFileChosen(event)">
+<input type="file" id="folder-input" webkitdirectory style="display:none" onchange="onFolderChosen(event)">
+
+<script>
+// ── Zustand ──────────────────────────────────────
+let currentHtml  = '', selectedWid = null, selectedInfo = null;
+let clipboard    = null, currentView = 'preview', currentFile = '', flashTimer = null;
+let blobMap      = {}, currentImgFile = null, currentBlobUrl = null, imgInsertMode = 'after';
+let folderFileMap = {}, cssCache = {}, previewBlobUrls = [];
+let folderFileList = [], htmlDirInFolder = '', currentImgRelPath = '', currentFolderName = '';
+let linkType = 'internal', pickedLinkPath = '';
+
+const DEMO_HTML = `<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8"><title>Meine Webseite</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 28px; max-width: 820px; margin: 0 auto; }
+    h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+    h2 { color: #34495e; margin-top: 0; }
+    p  { color: #555; line-height: 1.7; }
+    .kachel { border: 1px solid #dce3ec; border-radius: 10px; padding: 22px 24px; margin: 14px 0; background: #f8fafc; }
+    .hinweis { background: #fffbeb; border-left: 5px solid #f59e0b; padding: 14px 18px; margin: 14px 0; border-radius: 0 8px 8px 0; }
+  </style>
+</head>
+<body>
+  <h1>S\u00FCdth\u00FCringer Literaturverein</h1>
+  <div class="kachel"><h2>Lesung: Holger Uske</h2><p>Freitag, 15. M\u00E4rz 2025 \u00B7 19:00 Uhr \u00B7 Stadtbibliothek Sonneberg<br>Eintritt frei, alle herzlich willkommen!</p></div>
+  <div class="kachel"><h2>Schreibwerkstatt</h2><p>Jeden ersten Dienstag im Monat, 18:00 Uhr.<br>F\u00FCr alle, die gerne schreiben und Feedback suchen.</p></div>
+  <div class="hinweis"><p>Alle Veranstaltungen sind \u00F6ffentlich und kostenlos zug\u00E4nglich.</p></div>
+</body>
+</html>`;
+
+// ── CSS aus Ordner lesen ──────────────────────────
+function readCssFile(href) {
+  if (cssCache[href] !== undefined) return Promise.resolve(cssCache[href]);
+  const key = href.replace(/^\.\//, '').replace(/^\.\.\//, '');
+  const file = folderFileMap[key] || folderFileMap[href];
+  if (!file) { cssCache[href] = ''; return Promise.resolve(''); }
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = ev => { cssCache[href] = ev.target.result; resolve(ev.target.result); };
+    reader.onerror = () => { cssCache[href] = ''; resolve(''); };
+    reader.readAsText(file, 'UTF-8');
+  });
+}
+
+// ── iframe aufbauen ───────────────────────────────
+async function buildIframe(html) {
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    // Alte Vorschau-Blob-URLs freigeben
+    previewBlobUrls.forEach(u => URL.revokeObjectURL(u));
+    previewBlobUrls = [];
+    if (Object.keys(folderFileMap).length > 0) {
+      // CSS-Inlining: externe Stylesheets durch <style>-Blöcke ersetzen
+      const linkEls = Array.from(doc.querySelectorAll('link[rel="stylesheet"][href]'));
+      for (const link of linkEls) {
+        const href = link.getAttribute('href');
+        if (/^https?:\/\//i.test(href) || href.startsWith('//')) continue;
+        const cssText = await readCssFile(href);
+        if (cssText) {
+          const styleEl = doc.createElement('style');
+          styleEl.textContent = cssText;
+          link.parentNode.replaceChild(styleEl, link);
+        }
+      }
+      // Bilder: relative src durch Blob-URLs ersetzen
+      const imgEls = Array.from(doc.querySelectorAll('img[src]'));
+      for (const img of imgEls) {
+        const src = img.getAttribute('src');
+        if (/^https?:\/\//i.test(src) || src.startsWith('//') || src.startsWith('blob:') || src.startsWith('data:')) continue;
+        const key = src.replace(/^\.\//, '').replace(/^\.\.\//, '');
+        const file = folderFileMap[key] || folderFileMap[src] || folderFileMap[src.split('/').pop()];
+        if (file) {
+          const blobUrl = URL.createObjectURL(file);
+          previewBlobUrls.push(blobUrl);
+          img.setAttribute('src', blobUrl);
+        }
+      }
+    }
+    let wid = 0;
+    doc.body.querySelectorAll('*').forEach(el => el.setAttribute('data-wid', ++wid));
+    const style = doc.createElement('style');
+    style.textContent = `
+      [data-wid]{cursor:pointer!important;transition:outline .08s}
+      [data-wid]:hover{outline:2px dashed #60a5fa!important;outline-offset:1px}
+      .wsel{outline:3px solid #2563eb!important;outline-offset:1px;background-color:rgba(37,99,235,.06)!important}
+      .wedit{outline:3px solid #16a34a!important;background-color:rgba(22,163,74,.07)!important;cursor:text!important}
+      .wedit *{cursor:text!important}`;
+    doc.head.appendChild(style);
+    const script = doc.createElement('script');
+    script.textContent = `(function(){
+      var cur=null,editing=null;
+      document.addEventListener('click',function(e){
+        if(editing)return;
+        var t=e.target;
+        while(t&&!t.hasAttribute('data-wid'))t=t.parentElement;
+        if(!t||t===document.body)return;
+        e.preventDefault();e.stopPropagation();
+        if(cur)cur.classList.remove('wsel');
+        cur=t;t.classList.add('wsel');
+        window.parent.postMessage({type:'ws',wid:t.getAttribute('data-wid'),tag:t.tagName.toLowerCase(),
+          cls:(t.getAttribute('class')||'').replace('wsel','').trim(),outerHTML:t.outerHTML,
+          preview:t.textContent.trim().slice(0,100)},'*');
+      },true);
+      document.addEventListener('dblclick',function(e){
+        var t=e.target;
+        while(t&&!t.hasAttribute('data-wid'))t=t.parentElement;
+        if(!t||t===document.body)return;
+        e.preventDefault();e.stopPropagation();startEditing(t);
+      },true);
+      function startEditing(el){
+        if(editing&&editing!==el)stopEditing(true);
+        editing=el;
+        if(cur&&cur!==el)cur.classList.remove('wsel');
+        cur=el;el.setAttribute('contenteditable','true');
+        el.classList.add('wsel');el.classList.add('wedit');el.focus();
+        var r=document.createRange();r.selectNodeContents(el);r.collapse(false);
+        var s=window.getSelection();s.removeAllRanges();s.addRange(r);
+        window.parent.postMessage({type:'weditstart',wid:el.getAttribute('data-wid')},'*');
+      }
+      function stopEditing(send){
+        if(!editing)return;
+        editing.removeAttribute('contenteditable');editing.classList.remove('wedit');
+        if(send)window.parent.postMessage({type:'weditdone',
+          wid:editing.getAttribute('data-wid'),innerHTML:editing.innerHTML},'*');
+        editing=null;
+      }
+      document.addEventListener('mousedown',function(e){
+        if(editing&&!editing.contains(e.target))stopEditing(true);
+      },true);
+      document.addEventListener('keydown',function(e){
+        if(!editing)return;
+        if(e.key==='Escape'){stopEditing(false);return;}
+        var inl=['P','H1','H2','H3','H4','H5','H6','SPAN','A','LI','TD','TH'];
+        if(e.key==='Enter'&&inl.indexOf(editing.tagName)!==-1){e.preventDefault();stopEditing(true);}
+      });
+      window.addEventListener('message',function(e){
+        if(e.data&&e.data.type==='wstartedit'){
+          var el=document.querySelector('[data-wid="'+e.data.wid+'"]');
+          if(el)startEditing(el);
+        }
+      });
+      document.addEventListener('click',function(e){
+        if(editing)return;
+        if(!e.target.hasAttribute('data-wid')&&!e.target.closest('[data-wid]')){
+          if(cur){cur.classList.remove('wsel');cur=null;}
+          window.parent.postMessage({type:'wdesel'},'*');
+        }
+      });
+    })();`;
+    doc.body.appendChild(script);
+    return '<!DOCTYPE html>'+doc.documentElement.outerHTML;
+  } catch(err){return html;}
+}
+
+// ── HTML manipulieren ────────────────────────────
+function cleanDoc(doc){
+  doc.querySelectorAll('[data-wid]').forEach(el=>el.removeAttribute('data-wid'));
+  doc.querySelectorAll('.wsel,.wedit').forEach(el=>{el.classList.remove('wsel');el.classList.remove('wedit');});
+  doc.querySelectorAll('style').forEach(s=>{if(s.textContent.includes('data-wid'))s.remove();});
+  doc.querySelectorAll('script').forEach(s=>{if(s.textContent.includes('postMessage'))s.remove();});
+}
+function doManipulate(fn){
+  if(!currentHtml)return;
+  const doc=new DOMParser().parseFromString(currentHtml,'text/html');
+  let c=0;doc.body.querySelectorAll('*').forEach(el=>el.setAttribute('data-wid',++c));
+  const el=selectedWid?doc.querySelector('[data-wid="'+selectedWid+'"]'):null;
+  fn(doc,el);cleanDoc(doc);
+  currentHtml='<!DOCTYPE html>'+doc.documentElement.outerHTML;
+  clearSelection();refresh();
+}
+function doManipulateRaw(fn){
+  if(!currentHtml)return;
+  const doc=new DOMParser().parseFromString(currentHtml,'text/html');
+  fn(doc);cleanDoc(doc);
+  currentHtml='<!DOCTYPE html>'+doc.documentElement.outerHTML;
+  clearSelection();refresh();
+}
+function stripEditorMarkup(html){
+  return html.replace(/\s*data-wid="\d+"/g,'').replace(/\s*class="wsel"/g,'').replace(/\s*class=""/g,'');
+}
+
+// ── Aktionen ─────────────────────────────────────
+function copyEl(){if(!selectedInfo)return;clipboard=stripEditorMarkup(selectedInfo.outerHTML||'');updateUI();flash('Kopiert');}
+function duplicateEl(){doManipulate((doc,el)=>{if(el)el.insertAdjacentElement('afterend',el.cloneNode(true));});flash('Dupliziert');}
+function pasteEl(){if(!clipboard)return;doManipulate((doc,el)=>{if(el)el.insertAdjacentHTML('afterend',clipboard);});flash('Eingef\u00FCgt');}
+function deleteEl(){if(!confirm('Element wirklich l\u00F6schen?'))return;doManipulate((doc,el)=>{if(el)el.remove();});flash('Gel\u00F6scht');}
+function moveUp(){doManipulate((doc,el)=>{if(el&&el.previousElementSibling)el.parentNode.insertBefore(el,el.previousElementSibling);});flash('Nach oben verschoben');}
+function moveDown(){doManipulate((doc,el)=>{if(el&&el.nextElementSibling)el.parentNode.insertBefore(el.nextElementSibling,el);});flash('Nach unten verschoben');}
+
+// BUG-FIX 1: Guard gegen leere Auswahl
+function startEdit(){
+  if(!selectedWid)return;
+  document.getElementById('preview-frame').contentWindow.postMessage({type:'wstartedit',wid:selectedWid},'*');
+}
+function applyCode(){currentHtml=document.getElementById('code-editor').value;clearSelection();refresh();flash('Code \u00FCbernommen');}
+
+// ── Hyperlink-Dialog ──────────────────────────────
+function openLinkDialog(){
+  if(!selectedInfo)return;
+  pickedLinkPath='';
+  document.getElementById('link-picked-display').style.display='none';
+  document.getElementById('link-path-warn').style.display='none';
+  const outer=selectedInfo.outerHTML||'';
+  const curHref=(outer.match(/\bhref="([^"]*)"/)||[])[1]||'';
+  const curTarget=(outer.match(/\btarget="([^"]*)"/)||[])[1]||'';
+  document.getElementById('link-new-tab').checked=curTarget==='_blank';
+  if(/^https?:\/\/|^\/\//i.test(curHref)){
+    setLinkType('external');
+    document.getElementById('link-url').value=curHref;
+  } else {
+    setLinkType('internal');
+    if(curHref){
+      pickedLinkPath=curHref;
+      document.getElementById('link-picked-name').textContent=curHref;
+      document.getElementById('link-picked-display').style.display='block';
+    }
+  }
+  updateLinkResult();
+  document.getElementById('link-overlay').style.display='flex';
+}
+
+function setLinkType(type){
+  linkType=type;
+  document.getElementById('link-int-section').style.display=type==='internal'?'block':'none';
+  document.getElementById('link-ext-section').style.display=type==='external'?'block':'none';
+  document.getElementById('btn-link-int').className=type==='internal'?'primary':'';
+  document.getElementById('btn-link-ext').className=type==='external'?'primary':'';
+  updateLinkResult();
+}
+
+function onFilePickerLink(input){
+  const file=input.files[0]; if(!file)return;
+  const match=folderFileList.find(({relPath})=>{
+    const f=folderFileMap[relPath];
+    return f&&f.name===file.name;
+  });
+  const found=!!match;
+  pickedLinkPath=found?match.relPath:file.name;
+  document.getElementById('link-path-warn').style.display=found?'none':'block';
+  document.getElementById('link-picked-name').textContent=pickedLinkPath;
+  document.getElementById('link-picked-display').style.display='block';
+  updateLinkResult();
+  input.value='';
+}
+
+function updateLinkResult(){
+  let href='';
+  if(linkType==='internal') href=relativePathTo(pickedLinkPath);
+  else href=document.getElementById('link-url').value.trim();
+  document.getElementById('link-result').textContent=href||'\u2014 bitte Link w\u00E4hlen \u2014';
+  document.getElementById('link-result').style.color=href?'#4ade80':'#64748b';
+  document.getElementById('btn-confirm-link').disabled=!href;
+}
+
+function closeLinkDialog(){document.getElementById('link-overlay').style.display='none';}
+
+function confirmLink(){
+  let href='';
+  if(linkType==='internal'){
+    href=relativePathTo(pickedLinkPath);
+  } else {
+    href=document.getElementById('link-url').value.trim();
+    if(href&&!/^https?:\/\//i.test(href)&&!href.startsWith('//'))href='https://'+href;
+  }
+  if(!href)return;
+  const newTab=document.getElementById('link-new-tab').checked;
+  doManipulate((doc,el)=>{
+    if(!el)return;
+    if(el.tagName==='A'){
+      el.setAttribute('href',href);
+      if(newTab)el.setAttribute('target','_blank');else el.removeAttribute('target');
+    } else {
+      const a=doc.createElement('a');
+      a.setAttribute('href',href);
+      if(newTab)a.setAttribute('target','_blank');
+      el.parentNode.insertBefore(a,el);
+      a.appendChild(el);
+    }
+  });
+  closeLinkDialog();
+  flash('Link gesetzt: '+href);
+}
+
+document.getElementById('link-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('link-overlay'))closeLinkDialog();});
+document.getElementById('link-overlay').addEventListener('keydown',e=>{if(e.key==='Escape')closeLinkDialog();});
+
+// ── Pfad-Hilfsfunktion ────────────────────────────
+function relativePathTo(targetPath){
+  if(!targetPath)return'';
+  if(!htmlDirInFolder)return targetPath;
+  const from=htmlDirInFolder.split('/');
+  const toParts=targetPath.split('/');
+  const toFile=toParts.pop();
+  const toDir=toParts;
+  let common=0;
+  while(common<from.length&&common<toDir.length&&from[common]===toDir[common])common++;
+  const ups=from.length-common;
+  const downs=toDir.slice(common);
+  return'../'.repeat(ups)+(downs.length?downs.join('/')+'/':'')+toFile;
+}
+
+// ── Foto einfügen ─────────────────────────────────
+function imgRelPath(imgPath){
+  if(!htmlDirInFolder)return imgPath;
+  return '../'.repeat(htmlDirInFolder.split('/').length)+imgPath;
+}
+
+function extractSelectedDimensions(){
+  if(!selectedInfo||!selectedInfo.outerHTML)return null;
+  const m=selectedInfo.outerHTML.match(/<img[^>]+>/i);
+  if(!m)return null;
+  const tag=m[0];
+  const sm=tag.match(/style="([^"]*)"/i);
+  if(sm){
+    const wm=sm[1].match(/(?:max-)?width\s*:\s*([^;]+)/i);
+    const hm=sm[1].match(/(?:max-)?height\s*:\s*([^;]+)/i);
+    if(wm)return{width:wm[1].trim(),height:hm?hm[1].trim():null};
+  }
+  const wm=tag.match(/\bwidth="([^"]*)"/i);
+  const hm=tag.match(/\bheight="([^"]*)"/i);
+  if(wm)return{width:wm[1]+'px',height:hm?hm[1]+'px':null};
+  return null;
+}
+
+function openPhotoDialog(mode){
+  imgInsertMode=mode; currentImgFile=null; currentImgRelPath='';
+  if(currentBlobUrl){URL.revokeObjectURL(currentBlobUrl);currentBlobUrl=null;}
+  document.getElementById('dlg-alt').value='';
+  document.getElementById('dlg-rel-path').textContent='\u2014 bitte zuerst Bild w\u00E4hlen \u2014';
+  document.getElementById('dlg-rel-path').style.color='#64748b';
+  document.getElementById('dlg-img-preview').style.display='none';
+  document.getElementById('btn-confirm-photo').disabled=true;
+  document.getElementById('dlg-path-warn').style.display='none';
+  const isReplace=mode==='replace';
+  document.querySelector('#photo-overlay h3').textContent=(isReplace?'\uD83D\uDD04':'\uD83D\uDDBC\uFE0F')+' Foto '+(isReplace?'ersetzen':'einf\u00FCgen');
+  document.getElementById('btn-confirm-photo').textContent=isReplace?'\u2714 Ersetzen':'\u2714 Einf\u00FCgen';
+  const dims=extractSelectedDimensions();
+  if(dims){
+    document.getElementById('dlg-dim-label').textContent=dims.width+(dims.height?' \u00D7 '+dims.height:'');
+    document.getElementById('dlg-dim-row').style.display='block';
+  }else{
+    document.getElementById('dlg-dim-row').style.display='none';
+  }
+  refreshPhotoDialog();
+  document.getElementById('photo-overlay').style.display='flex';
+}
+
+function refreshPhotoDialog(){
+  // Dateimanager-Ansatz: kein Dropdown n\u00F6tig, Dialog ist immer bereit
+  document.getElementById('dlg-path-warn').style.display='none';
+}
+
+function onFilePickerImage(input){
+  const file=input.files[0]; if(!file)return;
+  if(currentBlobUrl)URL.revokeObjectURL(currentBlobUrl);
+  currentImgFile=file;
+  currentBlobUrl=URL.createObjectURL(file);
+  // Relativen Pfad aus folderFileMap ermitteln (nach Name + Gr\u00F6\u00DFe)
+  const match=folderFileList.find(({relPath})=>{
+    const f=folderFileMap[relPath];
+    return f&&f.name===file.name&&f.size===file.size;
+  });
+  const found=!!match;
+  currentImgRelPath=found?match.relPath:file.name;
+  document.getElementById('dlg-path-warn').style.display=found?'none':'block';
+  const prev=document.getElementById('dlg-img-preview');
+  prev.src=currentBlobUrl; prev.style.display='block';
+  if(!document.getElementById('dlg-alt').value)
+    document.getElementById('dlg-alt').value=file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
+  const finalPath=relativePathTo(currentImgRelPath);
+  document.getElementById('dlg-rel-path').textContent=finalPath||file.name;
+  document.getElementById('dlg-rel-path').style.color=found?'#4ade80':'#fbbf24';
+  document.getElementById('btn-confirm-photo').disabled=false;
+  input.value='';
+}
+
+function closePhotoDialog(){document.getElementById('photo-overlay').style.display='none';}
+
+function confirmPhoto(){
+  if(!currentImgFile||!currentBlobUrl)return;
+  const finalPath=relativePathTo(currentImgRelPath)||currentImgRelPath;
+  const alt=document.getElementById('dlg-alt').value.trim()||currentImgFile.name.replace(/\.[^.]+$/,'');
+  let widthStyle;
+  const dims=extractSelectedDimensions();
+  const useDims=document.getElementById('dlg-use-dims');
+  if(dims&&useDims&&useDims.checked){
+    widthStyle='width:'+dims.width+';'+(dims.height?'height:'+dims.height+';':'height:auto;');
+  }else{
+    widthStyle=document.getElementById('dlg-width').value+' height:auto;';
+  }
+  blobMap[currentBlobUrl]=finalPath;
+  const imgTag='<img src="'+currentBlobUrl+'" alt="'+alt+'" style="'+widthStyle+' display:block; margin:12px 0;" onerror="this.style.display=\'none\'">';
+  closePhotoDialog();
+  if(imgInsertMode==='replace') doManipulate((doc,el)=>{
+    if(el){const tmp=doc.createElement('div');tmp.innerHTML=imgTag;el.parentNode.replaceChild(tmp.firstElementChild,el);}
+  });
+  else if(imgInsertMode==='end') doManipulateRaw(doc=>doc.body.insertAdjacentHTML('beforeend',imgTag));
+  else doManipulate((doc,el)=>{if(el)el.insertAdjacentHTML('afterend',imgTag);else doc.body.insertAdjacentHTML('beforeend',imgTag);});
+  flash('Foto '+(imgInsertMode==='replace'?'ersetzt':'eingef\u00FCgt')+': '+finalPath);
+}
+
+document.getElementById('photo-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('photo-overlay'))closePhotoDialog();});
+document.getElementById('photo-overlay').addEventListener('keydown',e=>{if(e.key==='Escape')closePhotoDialog();});
+
+// ── Datei öffnen / speichern ──────────────────────
+function openFile(){document.getElementById('file-input').click();}
+function openFolder(){document.getElementById('folder-input').click();}
+
+function onFolderChosen(e){
+  folderFileMap={};cssCache={};folderFileList=[];
+  const files=Array.from(e.target.files);
+  currentFolderName=files.length?files[0].webkitRelativePath.split('/')[0]:'';
+  files.forEach(file=>{
+    const rel=file.webkitRelativePath.replace(/^[^/]+\//,'');
+    folderFileMap[rel]=file;
+    folderFileMap[file.name]=file;
+    folderFileList.push({relPath:rel,file});
+  });
+  if(currentFile){
+    const entry=folderFileList.find(({relPath})=>relPath===currentFile||relPath.endsWith('/'+currentFile));
+    htmlDirInFolder=(entry&&entry.relPath.includes('/'))
+      ?entry.relPath.substring(0,entry.relPath.lastIndexOf('/')):'';
+  }
+  e.target.value='';
+  document.getElementById('ib-folder').textContent=currentFolderName||'\u2014';
+  document.getElementById('ib-folder').className='ib-folder';
+  flash('Arbeitspfad festgelegt \u2013 '+folderFileList.length+' Dateien verf\u00FCgbar');
+  if(currentHtml)refresh();
+  if(document.getElementById('photo-overlay').style.display!=='none')refreshPhotoDialog();
+}
+
+function onFileChosen(e){
+  const file=e.target.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    currentHtml=ev.target.result; currentFile=file.name; blobMap={};
+    document.getElementById('preview-filename').textContent=file.name;
+    document.getElementById('ib-file').textContent=file.name;
+    document.getElementById('ib-file').className='ib-file';
+    if(folderFileList.length>0){
+      const entry=folderFileList.find(({relPath})=>relPath===file.name||relPath.endsWith('/'+file.name));
+      htmlDirInFolder=(entry&&entry.relPath.includes('/'))
+        ?entry.relPath.substring(0,entry.relPath.lastIndexOf('/')):'';
+    }
+    clearSelection();showEditor();refresh();
+    flash(file.name+' geladen');
+  };
+  reader.readAsText(file,'UTF-8');
+  e.target.value='';
+}
+
+function saveFile(){
+  if(!currentHtml)return;
+  // BUG-FIX 2: Blob-URLs durch relative Pfade ersetzen vor dem Speichern
+  let html=currentHtml;
+  for(const[blobUrl,relPath]of Object.entries(blobMap)) html=html.split(blobUrl).join(relPath);
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=currentFile||'seite.html';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  flash('Gespeichert: '+(currentFile||'seite.html'));
+}
+
+function loadDemo(){
+  currentHtml=DEMO_HTML; currentFile='demo.html'; blobMap={};
+  document.getElementById('preview-filename').textContent='demo.html (Beispiel)';
+  clearSelection();showEditor();refresh();
+  flash('Beispiel geladen \u2013 zum Ausprobieren');
+}
+
+// ── Ansicht ───────────────────────────────────────
+function setView(v){
+  currentView=v;
+  ['split','preview','code'].forEach(id=>document.getElementById('tab-'+id).classList.toggle('active',id===v));
+  const pp=document.getElementById('panel-preview'), pc=document.getElementById('panel-code');
+  if(v==='split'){pp.classList.remove('hidden');pc.classList.remove('hidden');}
+  if(v==='preview'){pp.classList.remove('hidden');pc.classList.add('hidden');}
+  if(v==='code'){pp.classList.add('hidden');pc.classList.remove('hidden');}
+}
+function showEditor(){
+  document.getElementById('welcome').classList.add('hidden');
+  document.getElementById('panel-preview').classList.remove('hidden');
+  document.getElementById('panel-code').classList.remove('hidden');
+  setView(currentView==='split'?'split':currentView);
+}
+async function refresh(){
+  document.getElementById('preview-frame').srcdoc=await buildIframe(currentHtml);
+  document.getElementById('code-editor').value=currentHtml;
+  updateUI();
+  if(Object.keys(folderFileMap).length===0&&currentHtml){
+    const hasCssLinks=/<link[^>]+stylesheet[^>]+href=["'][^"'#][^"']*["']/i.test(currentHtml);
+    const hasImgs=/<img[^>]+src=["'][^"'#:][^"']*["']/i.test(currentHtml);
+    if(hasCssLinks||hasImgs)flash('Tipp: Klicken Sie \u201EArbeitspfad festlegen\u201C, damit Bilder und CSS-Stile erscheinen');
+  }
+}
+
+// ── Auswahl & UI ──────────────────────────────────
+function clearSelection(){selectedWid=null;selectedInfo=null;updateUI();}
+
+function updateUI(){
+  const hasSel=!!selectedWid, hasClip=!!clipboard;
+  ['btn-copy','btn-dup','btn-up','btn-down','btn-del','btn-edit','btn-photo']
+    .forEach(id=>document.getElementById(id).disabled=!hasSel);
+  document.getElementById('btn-paste').disabled=!hasSel||!hasClip;
+  const isImg=hasSel&&selectedInfo&&selectedInfo.tag==='img';
+  document.getElementById('btn-photo-replace').disabled=!isImg;
+  document.getElementById('btn-link').disabled=!hasSel;
+  const selEl=document.getElementById('status-sel'), clipEl=document.getElementById('status-clip'), defEl=document.getElementById('status-default');
+  if(hasSel&&selectedInfo){
+    const tag=selectedInfo.tag||'?', cls=selectedInfo.cls?'.'+selectedInfo.cls.split(' ')[0]:'';
+    const pre=selectedInfo.preview?' \u2192 "'+selectedInfo.preview.slice(0,50)+(selectedInfo.preview.length>50?'\u2026':'')+'"':'';
+    selEl.textContent='\u25B6 <'+tag+cls+'>'+pre;
+    selEl.classList.remove('hidden');defEl.classList.add('hidden');
+  } else {
+    selEl.classList.add('hidden');
+    if(currentHtml){defEl.textContent=currentFile?currentFile+' geladen':'Bereit';defEl.classList.remove('hidden');}
+  }
+  clipEl.classList.toggle('hidden',!hasClip);
+}
+
+function flash(msg){
+  const el=document.getElementById('status-flash');
+  el.textContent=msg;el.classList.remove('hidden');
+  if(flashTimer)clearTimeout(flashTimer);
+  flashTimer=setTimeout(()=>el.classList.add('hidden'),2500);
+}
+
+// ── Nachrichten vom iframe ────────────────────────
+window.addEventListener('message',function(e){
+  if(!e.data)return;
+  if(e.data.type==='ws'){selectedWid=e.data.wid;selectedInfo=e.data;updateUI();}
+  if(e.data.type==='wdesel'){clearSelection();}
+  if(e.data.type==='weditstart'){
+    document.getElementById('btn-edit').classList.add('edit-active');
+    document.getElementById('btn-edit').textContent='\u270F\uFE0F Wird bearbeitet \u2026';
+    flash('Jetzt tippen \u2013 Enter oder Klick au\u00DFen zum Beenden');
+  }
+  if(e.data.type==='weditdone'){
+    document.getElementById('btn-edit').classList.remove('edit-active');
+    document.getElementById('btn-edit').textContent='\u270F\uFE0F Text bearbeiten';
+    const doc=new DOMParser().parseFromString(currentHtml,'text/html');
+    let c=0;doc.body.querySelectorAll('*').forEach(el=>el.setAttribute('data-wid',++c));
+    const el=doc.querySelector('[data-wid="'+e.data.wid+'"]');
+    if(el){
+      el.innerHTML=e.data.innerHTML;cleanDoc(doc);
+      currentHtml='<!DOCTYPE html>'+doc.documentElement.outerHTML;
+      document.getElementById('code-editor').value=currentHtml;
+      flash('Text gespeichert');
+    }
+  }
+});
+
+// ── Tastaturkürzel ────────────────────────────────
+document.addEventListener('keydown',function(e){
+  if(['TEXTAREA','INPUT','SELECT'].includes(e.target.tagName))return;
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveFile();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='c'){if(selectedWid){e.preventDefault();copyEl();}}
+  if((e.ctrlKey||e.metaKey)&&e.key==='v'){if(selectedWid&&clipboard){e.preventDefault();pasteEl();}}
+  if((e.ctrlKey||e.metaKey)&&e.key==='d'){if(selectedWid){e.preventDefault();duplicateEl();}}
+  if(e.key==='Delete'&&selectedWid)deleteEl();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bedienungsanleitung – HTML Editor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.8;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 30px 40px 60px 40px;
+      color: #222;
+      background: #fff;
+    }
+
+    h1 {
+      font-size: 26px;
+      color: #1a4a7a;
+      border-bottom: 3px solid #1a4a7a;
+      padding-bottom: 10px;
+      margin-bottom: 6px;
+    }
+
+    .untertitel {
+      color: #555;
+      font-size: 15px;
+      margin-bottom: 36px;
+    }
+
+    h2 {
+      font-size: 20px;
+      color: #1a4a7a;
+      margin-top: 40px;
+      margin-bottom: 10px;
+      border-left: 5px solid #3a9ad9;
+      padding-left: 12px;
+    }
+
+    h3 {
+      font-size: 17px;
+      color: #333;
+      margin-top: 24px;
+      margin-bottom: 6px;
+    }
+
+    .schritt {
+      background: #f0f7ff;
+      border: 1px solid #bdd9f5;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 14px 0;
+    }
+
+    .schritt .nr {
+      display: inline-block;
+      background: #1a4a7a;
+      color: white;
+      font-weight: bold;
+      font-size: 15px;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+      text-align: center;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+
+    .schritt-zeile {
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .schritt-text {
+      flex: 1;
+    }
+
+    .hinweis {
+      background: #fffbea;
+      border-left: 5px solid #f0b429;
+      padding: 12px 16px;
+      margin: 16px 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 15px;
+    }
+
+    .tipp {
+      background: #edfff4;
+      border-left: 5px solid #27ae60;
+      padding: 12px 16px;
+      margin: 16px 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 15px;
+    }
+
+    .warnung {
+      background: #fff0f0;
+      border-left: 5px solid #e74c3c;
+      padding: 12px 16px;
+      margin: 16px 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 15px;
+    }
+
+    th {
+      background: #1a4a7a;
+      color: white;
+      padding: 10px 14px;
+      text-align: left;
+    }
+
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #dde;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+      background: #f4f7fa;
+    }
+
+    .taste {
+      display: inline-block;
+      background: #e8e8e8;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      padding: 1px 8px;
+      font-family: Consolas, monospace;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .trennlinie {
+      border: none;
+      border-top: 2px solid #e0e8f0;
+      margin: 40px 0;
+    }
+
+    ul {
+      margin: 8px 0;
+      padding-left: 24px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    .seitenende {
+      margin-top: 60px;
+      text-align: center;
+      font-size: 13px;
+      color: #999;
+      border-top: 1px solid #ddd;
+      padding-top: 16px;
+    }
+
+    @media print {
+      body { padding: 20px; font-size: 14px; }
+      h2 { page-break-before: auto; }
+      .schritt { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>Bedienungsanleitung<br>HTML Editor</h1>
+<div class="untertitel">Einfache Anleitung zum Bearbeiten von Webseiten – kein Fachwissen nötig<br>
+Erstellt mit Cortex AI Solutions &amp; Claude Sonnet 4.6 – April 2026</div>
+
+<!-- ═══════════════════════════════════════ -->
+<h2>1. Programm starten</h2>
+
+<p>Der HTML Editor ist eine einzige Datei: <strong>HTML-Editor.html</strong><br>
+Sie müssen nichts installieren. So starten Sie das Programm:</p>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">1</span>
+    <div class="schritt-text">Speichern Sie die Datei <strong>HTML-Editor.html</strong> auf Ihrem Computer, z. B. auf dem Desktop.</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">2</span>
+    <div class="schritt-text">Machen Sie einen <strong>Doppelklick</strong> auf die Datei. Sie öffnet sich automatisch im Browser (Firefox, Chrome oder Edge).</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">3</span>
+    <div class="schritt-text">Der Editor erscheint mit einer blauen Titelleiste. Er ist bereit zur Benutzung.</div>
+  </div>
+</div>
+
+<div class="tipp">
+  💡 <strong>Tipp:</strong> Klicken Sie mit der rechten Maustaste auf die Datei und wählen Sie
+  „Öffnen mit" &rarr; „Firefox" oder „Chrome", falls sie sich nicht automatisch öffnet.
+</div>
+
+<hr class="trennlinie">
+
+<!-- ═══════════════════════════════════════ -->
+<h2>2. Arbeitspfad festlegen</h2>
+
+<p>Der <strong>Arbeitspfad</strong> ist der Ordner auf Ihrem Computer, in dem Ihre Website gespeichert ist –
+also der Ordner mit Ihren HTML-Dateien, Bildern und dem Design (CSS).</p>
+
+<div class="warnung">
+  ⚠️ <strong>Wichtig:</strong> Legen Sie den Arbeitspfad <em>immer zuerst</em> fest, bevor Sie eine Datei öffnen!
+  Nur so werden Bilder und das Design korrekt in der Vorschau angezeigt.
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">1</span>
+    <div class="schritt-text">Klicken Sie oben links auf den Button <strong>📁 Arbeitspfad festlegen</strong>.</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">2</span>
+    <div class="schritt-text">Es öffnet sich ein Ordner-Auswahl-Fenster. Navigieren Sie zum Ordner Ihrer Website und klicken Sie auf <strong>„Ordner auswählen"</strong>.</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">3</span>
+    <div class="schritt-text">Der Editor liest den gesamten Ordner ein – alle Bilder und CSS-Dateien werden geladen. In der <strong>Info-Leiste</strong> unterhalb der Werkzeugleiste sehen Sie den Namen des gewählten Ordners.</div>
+  </div>
+</div>
+
+<div class="tipp">
+  💡 <strong>Was passiert dabei?</strong> Der Editor lädt alle Dateien Ihres Website-Ordners in den Speicher.
+  Das Design Ihrer Seite (CSS) wird automatisch eingebettet, sodass die Vorschau genauso aussieht wie
+  die echte Website. Ihre Bilder werden automatisch angezeigt. Die gespeicherte Datei bleibt unverändert –
+  es wird nichts an Ihren Originaldateien verändert.
+</div>
+
+<hr class="trennlinie">
+
+<!-- ═══════════════════════════════════════ -->
+<h2>3. HTML-Datei öffnen</h2>
+
+<p>Nachdem der Arbeitspfad festgelegt wurde, öffnen Sie die Seite, die Sie bearbeiten möchten:</p>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">1</span>
+    <div class="schritt-text">Klicken Sie auf den Button <strong>📂 Öffnen</strong>.</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">2</span>
+    <div class="schritt-text">Es öffnet sich ein Datei-Auswahl-Fenster. Suchen Sie Ihre HTML-Datei (z. B. <em>termine.html</em>) und klicken Sie auf „Öffnen".</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">3</span>
+    <div class="schritt-text">Die Webseite erscheint als Vorschau. In der Info-Leiste wird der Dateiname angezeigt. Bilder und Design werden automatisch dargestellt – vorausgesetzt, der Arbeitspfad wurde zuvor festgelegt.</div>
+  </div>
+</div>
+
+<div class="hinweis">
+  📌 <strong>Hinweis:</strong> Die Info-Leiste unterhalb der Werkzeugleiste zeigt Ihnen immer,
+  welcher Ordner (Arbeitspfad) und welche Datei gerade geöffnet ist.
+</div>
+
+<hr class="trennlinie">
+
+<!-- ═══════════════════════════════════════ -->
+<h2>4. Ansicht wechseln</h2>
+
+<p>Direkt unterhalb der Werkzeug-Leiste gibt es drei Schaltflächen:</p>
+
+<table>
+  <tr>
+    <th>Schaltfläche</th>
+    <th>Was man sieht</th>
+  </tr>
+  <tr>
+    <td><strong>👁 Vorschau</strong></td>
+    <td>Nur die Vorschau (Standard – am besten zum Bearbeiten geeignet)</td>
+  </tr>
+  <tr>
+    <td><strong>⬛ Geteilt</strong></td>
+    <td>Links die Vorschau, rechts der HTML-Code – beides gleichzeitig</td>
+  </tr>
+  <tr>
+    <td><strong>&lt;/&gt; Code</strong></td>
+    <td>Nur den HTML-Quellcode (für Fortgeschrittene)</td>
+  </tr>
+</table>
+
+<div class="tipp">
+  💡 <strong>Empfehlung:</strong> Arbeiten Sie in der <strong>Vorschau-Ansicht</strong> –
+  so sehen Sie die Seite so, wie sie auf der Website erscheint, und haben die meiste Fläche zum Bearbeiten.
+</div>
+
+<hr class="trennlinie">
+
+<!-- ═══════════════════════════════════════ -->
+<h2>5. Elemente auswählen</h2>
+
+<p>Bevor Sie etwas bearbeiten, müssen Sie zuerst das gewünschte Element auswählen. Ein „Element" ist
+ein Bestandteil der Seite, z. B. ein Textabsatz, eine Überschrift, ein Bild oder ein Kasten.</p>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">1</span>
+    <div class="schritt-text"><strong>Einmal klicken</strong> auf ein Element in der Vorschau.</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">2</span>
+    <div class="schritt-text">Das Element bekommt einen <strong>blauen Rahmen</strong> – es ist jetzt ausgewählt.</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">3</span>
+    <div class="schritt-text">In der <strong>Info-Leiste</strong> unterhalb der Werkzeugleiste sehen Sie, welches Element ausgewählt ist.
+    Jetzt können Sie die Schaltflächen in der Werkzeugleiste verwenden.</div>
+  </div>
+</div>
+
+<div class="tipp">
+  💡 <strong>Tipp:</strong> Wenn Sie ein sehr kleines Element nicht treffen können, klicken Sie auf ein
+  größeres Element daneben und verschieben Sie es dann mit den Pfeilen „↑ Hoch" / „↓ Runter".
+</div>
+
+<hr class="trennlinie">
+
+<!-- ═══════════════════════════════════════ -->
+<h2>6. Text bearbeiten</h2>
+
+<p>Es gibt zwei Möglichkeiten, einen Text zu ändern:</p>
+
+<h3>Möglichkeit A – Doppelklick (einfachste Methode)</h3>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">1</span>
+    <div class="schritt-text">Machen Sie einen <strong>Doppelklick</strong> direkt auf den Text, den Sie ändern möchten.</div>
+  </div>
+</div>
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">2</span>
+    <div class="schritt-text">Der Bereich bekommt einen <strong>grünen Rahmen</strong> – jetzt können Sie direkt tippen, löschen und ändern.</div>
+  </div>
+</div>
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">3</span>
+    <div class="schritt-text">Drücken Sie <span class="taste">Enter</span> oder klicken Sie irgendwo außerhalb, um die Bearbeitung abzuschließen.
+    Die Änderung wird sofort übernommen.</div>
+  </div>
+</div>
+
+<h3>Möglichkeit B – über die Werkzeugleiste</h3>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">1</span>
+    <div class="schritt-text"><strong>Einmal klicken</strong> auf ein Element – es bekommt einen blauen Rahmen.</div>
+  </div>
+</div>
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">2</span>
+    <div class="schritt-text">Klicken Sie oben auf <strong>✏️ Text bearbeiten</strong>. Der grüne Bearbeitungsrahmen erscheint.</div>
+  </div>
+</div>
+
+<div class="hinweis">
+  📌 <strong>Abbrechen ohne Speichern:</strong> Drücken Sie <span class="taste">Esc</span>,
+  um die Bearbeitung abzubrechen – Ihre Änderungen werden dann verworfen und der ursprüngliche Text bleibt erhalten.
+</div>
+
+<hr class="trennlinie">
+
+<!-- ═══════════════════════════════════════ -->
+<h2>7. Elemente kopieren, verschieben, löschen</h2>
+
+<p>Wählen Sie zuerst ein Element aus (einmal klicken, blauer Rahmen), dann verwenden Sie diese Schaltflächen:</p>
+
+<table>
+  <tr>
+    <th>Schaltfläche</th>
+    <th>Tastenkürzel</th>
+    <th>Was passiert</th>
+  </tr>
+  <tr>
+    <td><strong>📋 Kopieren</strong></td>
+    <td><span class="taste">Strg</span>+<span class="taste">C</span></td>
+    <td>Element wird in die Zwischenablage kopiert</td>
+  </tr>
+  <tr>
+    <td><strong>⧉ Duplizieren</strong></td>
+    <td><span class="taste">Strg</span>+<span class="taste">D</span></td>
+    <td>Eine Kopie des Elements wird direkt darunter eingefügt</td>
+  </tr>
+  <tr>
+    <td><strong>📌 Einfügen</strong></td>
+    <td><span class="taste">Strg</span>+<span class="taste">V</span></td>
+    <td>Kopiertes Element wird nach dem ausgewählten eingefügt</td>
+  </tr>
+  <tr>
+    <td><strong>↑ Hoch</strong></td>
+    <td>–</td>
+    <td>Element eine Position nach oben schieben</td>
+  </tr>
+  <tr>
+    <td><strong>↓ Runter</strong></td>
+    <td>–</td>
+    <td>Element eine Position nach unten schieben</td>
+  </tr>
+  <tr>
+    <td><strong>🗑 Löschen</strong></td>
+    <td><span class="taste">Entf</span></td>
+    <td>Ausgewähltes Element löschen (mit Sicherheitsabfrage)</td>
+  </tr>
+</table>
+
+<div class="tipp">
+  💡 <strong>Beispiel – Veranstaltungseintrag duplizieren:</strong> Klicken Sie auf einen bestehenden
+  Eintrag, dann auf „⧉ Duplizieren". Die Kopie erscheint direkt darunter. Doppelklick auf den Text
+  der Kopie, um ihn anzupassen.
+</div>
+
+<hr class="trennlinie">
+
+<!-- ═══════════════════════════════════════ -->
+<h2>8. Foto einfügen</h2>
+
+<div class="warnung">
+  ⚠️ <strong>Voraussetzung:</strong> Der Arbeitspfad muss festgelegt sein (siehe Kapitel 2).
+  Nur dann stehen die Bilder aus Ihrem Website-Ordner zur Auswahl.
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">1</span>
+    <div class="schritt-text">Klicken Sie auf das Element, <em>nach dem</em> das Foto eingefügt werden soll (blauer Rahmen).</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">2</span>
+    <div class="schritt-text">Klicken Sie auf <strong>🖼 Foto einfügen</strong>. Ein Dialogfenster öffnet sich.</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">3</span>
+    <div class="schritt-text">Wählen Sie ein Bild aus dem <strong>Dropdown-Menü</strong>. Alle Bilder aus Ihrem Website-Ordner werden dort aufgelistet.
+    Nach der Auswahl erscheint eine kleine Vorschau des Bildes.</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">4</span>
+    <div class="schritt-text">Wählen Sie die gewünschte <strong>Breite</strong>:
+      <ul>
+        <li><strong>Volle Breite</strong> – Bild nimmt die volle Seitenbreite ein</li>
+        <li><strong>Halbe Breite</strong> – Bild nimmt die halbe Breite ein</li>
+        <li><strong>Klein</strong> – ca. 150 Pixel</li>
+        <li><strong>Mittel</strong> – ca. 300 Pixel</li>
+        <li><strong>Größe übernehmen</strong> – Größe des ausgewählten Elements (falls es ein Bild ist)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">5</span>
+    <div class="schritt-text">Geben Sie einen <strong>Alt-Text</strong> ein – eine kurze Beschreibung des Bildes, z. B. „Vereinstreffen im Saal".
+    Das ist wichtig für blinde Nutzer und Suchmaschinen.</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">6</span>
+    <div class="schritt-text">Klicken Sie auf <strong>Einfügen</strong>. Das Bild erscheint in der Vorschau an der gewünschten Stelle.</div>
+  </div>
+</div>
+
+<div class="tipp">
+  💡 <strong>Relativer Pfad:</strong> Der Editor berechnet automatisch den richtigen Dateipfad zum Bild –
+  Sie müssen sich keine Pfade merken. In der gespeicherten HTML-Datei steht der korrekte relative Pfad,
+  wie er auf der echten Website benötigt wird.
+</div>
+
+<hr class="trennlinie">
+
+<!-- ═══════════════════════════════════════ -->
+<h2>9. Foto ersetzen</h2>
+
+<p>Wenn Sie ein bereits eingefügtes Bild durch ein anderes ersetzen möchten, müssen Sie es nicht löschen und neu einfügen.</p>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">1</span>
+    <div class="schritt-text"><strong>Klicken Sie auf das Bild</strong>, das Sie ersetzen möchten (blauer Rahmen erscheint).</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">2</span>
+    <div class="schritt-text">Der Button <strong>🖼 Foto ersetzen</strong> in der Werkzeugleiste wird jetzt aktiv (er ist sonst ausgegraut).
+    Klicken Sie darauf.</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">3</span>
+    <div class="schritt-text">Der Foto-Dialog öffnet sich. Wählen Sie das neue Bild aus dem Dropdown, passen Sie Größe und Alt-Text an.</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">4</span>
+    <div class="schritt-text">Klicken Sie auf <strong>Ersetzen</strong>. Das alte Bild wird direkt durch das neue ersetzt – kein doppeltes Bild, keine Verschiebung.</div>
+  </div>
+</div>
+
+<div class="hinweis">
+  📌 <strong>Hinweis:</strong> Der Button „Foto ersetzen" ist nur aktiv, wenn ein Bild (<code>&lt;img&gt;</code>)
+  ausgewählt ist. Bei allen anderen Elementen ist er ausgegraut.
+</div>
+
+<hr class="trennlinie">
+
+<!-- ═══════════════════════════════════════ -->
+<h2>10. Hyperlink bearbeiten</h2>
+
+<p>Mit dem Hyperlink-Button können Sie einem Element einen Link hinzufügen – z. B. zu einer anderen
+Seite Ihrer Website oder zu einer externen Webseite.</p>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">1</span>
+    <div class="schritt-text"><strong>Klicken Sie auf das Element</strong>, das verlinkt werden soll (blauer Rahmen).</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">2</span>
+    <div class="schritt-text">Klicken Sie auf <strong>🔗 Hyperlink</strong>. Ein Dialogfenster öffnet sich.</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">3</span>
+    <div class="schritt-text">Wählen Sie den Link-Typ:
+      <ul>
+        <li><strong>Seite im Arbeitspfad</strong>: Wählen Sie eine HTML-Datei aus Ihrem Website-Ordner aus dem Dropdown.
+        Der korrekte relative Pfad wird automatisch berechnet.</li>
+        <li><strong>Eigene URL</strong>: Geben Sie eine vollständige Webadresse ein, z. B. <em>https://www.example.de</em>.
+        Falls Sie das „https://" vergessen, wird es automatisch ergänzt.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">4</span>
+    <div class="schritt-text">Optional: Aktivieren Sie die Checkbox <strong>„In neuem Tab öffnen"</strong>,
+    wenn der Link in einem neuen Browser-Tab geöffnet werden soll (empfohlen für externe Links).</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">5</span>
+    <div class="schritt-text">Klicken Sie auf <strong>Speichern</strong>.</div>
+  </div>
+</div>
+
+<div class="tipp">
+  💡 <strong>Funktioniert für alle Elemente:</strong> Sie können nicht nur Text-Links, sondern auch Bilder,
+  Kacheln oder Überschriften verlinken. Wenn das ausgewählte Element selbst kein Link ist,
+  wird es automatisch in einen Link eingebettet.
+  Wenn es bereits ein Link ist, wird der bestehende Link bearbeitet.
+</div>
+
+<hr class="trennlinie">
+
+<!-- ═══════════════════════════════════════ -->
+<h2>11. Datei speichern</h2>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">1</span>
+    <div class="schritt-text">Klicken Sie oben auf <strong>💾 Speichern</strong> – oder drücken Sie <span class="taste">Strg</span>+<span class="taste">S</span>.</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">2</span>
+    <div class="schritt-text">Der Browser lädt die Datei automatisch herunter – sie landet im <strong>Downloads-Ordner</strong> Ihres Computers.</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">3</span>
+    <div class="schritt-text">Kopieren Sie die gespeicherte Datei in den Ordner Ihrer Website (und ersetzen Sie dabei die alte Datei).</div>
+  </div>
+</div>
+
+<div class="tipp">
+  💡 <strong>Originale Pfade bleiben erhalten:</strong> Die gespeicherte Datei enthält die gleichen
+  Verweise auf CSS-Dateien und Bilder wie vorher – nur mit Ihren inhaltlichen Änderungen.
+  Das eingebettete Design (CSS) der Vorschau wird <em>nicht</em> in die gespeicherte Datei geschrieben.
+  Alles funktioniert auf der echten Website genauso wie vorher – nur mit Ihren Änderungen.
+</div>
+
+<div class="hinweis">
+  📌 <strong>Tipp bei Fehlern:</strong> Solange Sie nicht auf „💾 Speichern" geklickt haben,
+  können Sie die Originaldatei einfach erneut öffnen – alle Ihre Änderungen gehen dann verloren,
+  aber die Originaldatei ist unverändert.
+</div>
+
+<hr class="trennlinie">
+
+<!-- ═══════════════════════════════════════ -->
+<h2>12. Schaltflächen-Übersicht</h2>
+
+<table>
+  <tr>
+    <th>Schaltfläche</th>
+    <th>Was sie tut</th>
+  </tr>
+  <tr><td><strong>📁 Arbeitspfad festlegen</strong></td><td>Website-Ordner auswählen – lädt CSS und Bilder für die Vorschau</td></tr>
+  <tr><td><strong>📂 Öffnen</strong></td><td>Eine HTML-Datei laden und anzeigen</td></tr>
+  <tr><td><strong>💾 Speichern</strong></td><td>Die bearbeitete Datei herunterladen (<span class="taste">Strg</span>+<span class="taste">S</span>)</td></tr>
+  <tr><td><strong>📋 Kopieren</strong></td><td>Ausgewähltes Element kopieren (<span class="taste">Strg</span>+<span class="taste">C</span>)</td></tr>
+  <tr><td><strong>⧉ Duplizieren</strong></td><td>Ausgewähltes Element direkt darunter duplizieren (<span class="taste">Strg</span>+<span class="taste">D</span>)</td></tr>
+  <tr><td><strong>📌 Einfügen</strong></td><td>Kopiertes Element nach dem ausgewählten einfügen (<span class="taste">Strg</span>+<span class="taste">V</span>)</td></tr>
+  <tr><td><strong>↑ Hoch</strong></td><td>Ausgewähltes Element eine Position nach oben schieben</td></tr>
+  <tr><td><strong>↓ Runter</strong></td><td>Ausgewähltes Element eine Position nach unten schieben</td></tr>
+  <tr><td><strong>🗑 Löschen</strong></td><td>Ausgewähltes Element löschen (<span class="taste">Entf</span>)</td></tr>
+  <tr><td><strong>✏️ Text bearbeiten</strong></td><td>Text des ausgewählten Elements direkt bearbeiten</td></tr>
+  <tr><td><strong>🔗 Hyperlink</strong></td><td>Link auf das ausgewählte Element setzen oder bearbeiten</td></tr>
+  <tr><td><strong>🖼 Foto einfügen</strong></td><td>Ein Bild nach dem ausgewählten Element einfügen</td></tr>
+  <tr><td><strong>🖼 Foto ersetzen</strong></td><td>Das ausgewählte Bild durch ein anderes ersetzen (nur aktiv bei Bild-Auswahl)</td></tr>
+  <tr><td><strong>🖼 Foto ans Ende</strong></td><td>Ein Bild am Ende der Seite einfügen (immer verfügbar)</td></tr>
+  <tr><td><strong>?</strong></td><td>Diese Bedienungsanleitung öffnen</td></tr>
+</table>
+
+<hr class="trennlinie">
+
+<!-- ═══════════════════════════════════════ -->
+<h2>13. Häufige Fragen</h2>
+
+<h3>Die Bilder werden in der Vorschau nicht angezeigt.</h3>
+<p>Wahrscheinlich wurde der Arbeitspfad nicht festgelegt oder nach dem Arbeitspfad-Setzen
+vergessen, die Datei erneut zu öffnen. Gehen Sie so vor:
+(1) Klicken Sie auf „📁 Arbeitspfad festlegen" und wählen Sie den Website-Ordner.
+(2) Klicken Sie dann auf „📂 Öffnen" und laden Sie die HTML-Datei neu.</p>
+
+<h3>Das Design (CSS) sieht in der Vorschau falsch aus.</h3>
+<p>Auch hier hilft es, den Arbeitspfad zuerst festzulegen. Der Editor sucht im Website-Ordner
+nach CSS-Dateien und bettet sie in die Vorschau ein. Stellen Sie sicher, dass der Arbeitspfad
+auf den Hauptordner der Website zeigt, in dem auch die CSS-Dateien liegen.</p>
+
+<h3>Der Button „Foto ersetzen" ist ausgegraut.</h3>
+<p>Der Button ist nur aktiv, wenn ein Bild (<code>&lt;img&gt;</code>) ausgewählt ist.
+Klicken Sie zuerst auf das Bild in der Vorschau – es muss den blauen Auswahlrahmen bekommen.
+Danach wird der Button aktiv.</p>
+
+<h3>Ich kann keinen Hyperlink auf ein Bild setzen – geht das?</h3>
+<p>Ja, das geht. Klicken Sie auf das Bild (blauer Rahmen), dann auf „🔗 Hyperlink".
+Das Bild wird automatisch in einen anklickbaren Link eingebettet.</p>
+
+<h3>Der Link öffnet sich nicht auf der echten Website.</h3>
+<p>Prüfen Sie, ob der Link-Pfad stimmt. Bei internen Links (Seiten im Arbeitspfad) berechnet
+der Editor den Pfad automatisch. Bei externen Links prüfen Sie, ob die Adresse vollständig ist
+(z. B. <em>https://www.example.de</em>). Vergewissern Sie sich außerdem, dass die verlinkte
+Datei tatsächlich im richtigen Ordner auf dem Server liegt.</p>
+
+<h3>Ich habe versehentlich etwas gelöscht.</h3>
+<p>Schließen Sie die Datei <strong>ohne zu speichern</strong> und öffnen Sie die Originaldatei erneut.
+Solange Sie nicht auf „💾 Speichern" geklickt haben, ist die Originaldatei unverändert.</p>
+
+<h3>Umlaute (ä, ö, ü, ß) werden komisch angezeigt.</h3>
+<p>Stellen Sie sicher, dass die HTML-Datei oben im Code den Eintrag
+<code>&lt;meta charset="UTF-8"&gt;</code> enthält. Der Editor speichert immer in UTF-8,
+was die korrekte Einstellung ist.</p>
+
+<h3>Meine Änderungen sind nach dem Speichern nicht auf der Website zu sehen.</h3>
+<p>Die gespeicherte Datei landet im <em>Downloads-Ordner</em> Ihres Computers. Sie müssen sie noch
+manuell in den Webseiten-Ordner auf dem Server kopieren und dabei die alte Datei ersetzen.
+Leeren Sie danach den Browser-Cache, falls die Seite noch das alte Aussehen zeigt
+(<span class="taste">Strg</span>+<span class="taste">Shift</span>+<span class="taste">R</span>).</p>
+
+<div class="seitenende">
+  Bedienungsanleitung für den HTML Editor &nbsp;&middot;&nbsp;
+  Erstellt mit Cortex AI Solutions &amp; Claude Sonnet 4.6 &nbsp;&middot;&nbsp; April 2026
+</div>
+
+</body>
+</html>
