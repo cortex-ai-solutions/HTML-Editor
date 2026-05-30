@@ -106,6 +106,15 @@
       font-size: 15px;
     }
 
+    .neu {
+      background: #f0eaff;
+      border-left: 5px solid #8b5cf6;
+      padding: 12px 16px;
+      margin: 16px 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 15px;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -156,6 +165,38 @@
       margin-bottom: 6px;
     }
 
+    .modus-box {
+      display: flex;
+      gap: 16px;
+      margin: 16px 0;
+    }
+
+    .modus-karte {
+      flex: 1;
+      border-radius: 8px;
+      padding: 16px 18px;
+    }
+
+    .modus-text {
+      background: #f0f7ff;
+      border: 2px solid #3a9ad9;
+    }
+
+    .modus-foto {
+      background: #fff8ed;
+      border: 2px solid #f0a500;
+    }
+
+    .modus-karte h4 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+    }
+
+    .modus-karte ul {
+      margin: 0;
+      font-size: 15px;
+    }
+
     .seitenende {
       margin-top: 60px;
       text-align: center;
@@ -169,6 +210,7 @@
       body { padding: 20px; font-size: 14px; }
       h2 { page-break-before: auto; }
       .schritt { page-break-inside: avoid; }
+      .modus-box { flex-direction: column; }
     }
   </style>
 </head>
@@ -176,7 +218,7 @@
 
 <h1>Bedienungsanleitung<br>HTML Editor</h1>
 <div class="untertitel">Einfache Anleitung zum Bearbeiten von Webseiten – kein Fachwissen nötig<br>
-Erstellt mit Cortex AI Solutions &amp; Claude Sonnet 4.6 – April 2026</div>
+Erstellt mit Cortex AI Solutions &amp; Claude Sonnet 4.6 – Mai 2026</div>
 
 <!-- ═══════════════════════════════════════ -->
 <h2>1. Programm starten</h2>
@@ -333,15 +375,14 @@ ein Bestandteil der Seite, z. B. ein Textabsatz, eine Überschrift, ein Bild ode
 <div class="schritt">
   <div class="schritt-zeile">
     <span class="nr">2</span>
-    <div class="schritt-text">Das Element bekommt einen <strong>blauen Rahmen</strong> – es ist jetzt ausgewählt.</div>
+    <div class="schritt-text">Das Element bekommt einen <strong>blauen Rahmen</strong> – es ist jetzt ausgewählt. Der Editor wählt automatisch das nächstgelegene sinnvolle Element aus (z. B. den Absatz oder die Überschrift, nicht einzelne Wörter).</div>
   </div>
 </div>
 
 <div class="schritt">
   <div class="schritt-zeile">
     <span class="nr">3</span>
-    <div class="schritt-text">In der <strong>Info-Leiste</strong> unterhalb der Werkzeugleiste sehen Sie, welches Element ausgewählt ist.
-    Jetzt können Sie die Schaltflächen in der Werkzeugleiste verwenden.</div>
+    <div class="schritt-text">In der <strong>Statusleiste</strong> unten sehen Sie, welches Element ausgewählt ist. Jetzt können Sie die Schaltflächen in der Werkzeugleiste verwenden.</div>
   </div>
 </div>
 
@@ -390,8 +431,14 @@ ein Bestandteil der Seite, z. B. ein Textabsatz, eine Überschrift, ein Bild ode
 <div class="schritt">
   <div class="schritt-zeile">
     <span class="nr">2</span>
-    <div class="schritt-text">Klicken Sie oben auf <strong>✏️ Text bearbeiten</strong>. Der grüne Bearbeitungsrahmen erscheint.</div>
+    <div class="schritt-text">Klicken Sie oben auf <strong>✏️ Text bearbeiten</strong>. Der grüne Bearbeitungsrahmen erscheint. Der Editor wechselt automatisch in den Text-Modus.</div>
   </div>
+</div>
+
+<div class="tipp">
+  💡 <strong>Ganzen Bereich bearbeiten:</strong> Bei langen Texten (z. B. Gedichten) können Sie den gesamten
+  umgebenden Bereich (z. B. ein Kasten-Element) einmal anklicken und dann auf „✏️ Text bearbeiten" klicken.
+  So bearbeiten Sie alle Zeilen auf einmal, statt jede einzeln anzuklicken.
 </div>
 
 <div class="hinweis">
@@ -442,6 +489,11 @@ ein Bestandteil der Seite, z. B. ein Textabsatz, eine Überschrift, ein Bild ode
     <td><span class="taste">Entf</span></td>
     <td>Ausgewähltes Element löschen (mit Sicherheitsabfrage)</td>
   </tr>
+  <tr>
+    <td><strong>↩ Rückgängig</strong></td>
+    <td><span class="taste">Strg</span>+<span class="taste">Z</span></td>
+    <td>Letzte Änderung rückgängig machen (bis zu 20 Schritte)</td>
+  </tr>
 </table>
 
 <div class="tipp">
@@ -450,35 +502,115 @@ ein Bestandteil der Seite, z. B. ein Textabsatz, eine Überschrift, ein Bild ode
   der Kopie, um ihn anzupassen.
 </div>
 
+<div class="neu">
+  🆕 <strong>Rückgängig:</strong> Mit <strong>↩ Rückgängig</strong> (oder <span class="taste">Strg</span>+<span class="taste">Z</span>)
+  können Sie jede Änderung Schritt für Schritt rückgängig machen – bis zu 20 Schritte in die Vergangenheit.
+  Der Button ist ausgegraut, wenn es nichts zum Rückgängigmachen gibt.
+</div>
+
 <hr class="trennlinie">
 
 <!-- ═══════════════════════════════════════ -->
-<h2>8. Foto einfügen</h2>
+<h2>8. Text-Modus und Foto-Modus</h2>
+
+<p>Der Editor hat zwei Arbeitsmodi, die Sie oben in der Werkzeugleiste umschalten können:</p>
+
+<div class="modus-box">
+  <div class="modus-karte modus-text">
+    <h4>✎ Text-Modus <em>(Standard)</em></h4>
+    <ul>
+      <li>Klick auf Element → blauer Rahmen (kein Cursor)</li>
+      <li>Doppelklick → Text direkt bearbeiten</li>
+      <li>Klick in leere Fläche → Auswahl aufheben</li>
+      <li>Keine blauen Positionslinien</li>
+      <li>Ideal für: Texte ändern, Elemente verschieben, Hyperlinks setzen</li>
+    </ul>
+  </div>
+  <div class="modus-karte modus-foto">
+    <h4>📷 Foto-Modus</h4>
+    <ul>
+      <li>Klick auf Element → blauer Rahmen + blaue Linie darunter</li>
+      <li>Klick in leere Fläche → blaue Linie zeigt Einfügepunkt</li>
+      <li>Foto geht genau dorthin, wo die blaue Linie erscheint</li>
+      <li>Ideal für: Fotos einfügen, Bilder positionieren</li>
+    </ul>
+  </div>
+</div>
+
+<div class="hinweis">
+  📌 <strong>Automatischer Wechsel:</strong> Wenn Sie auf „✏️ Text bearbeiten" klicken, wechselt der
+  Editor automatisch in den Text-Modus. Wenn Sie auf „🖼 Foto einfügen" klicken oder ein Foto
+  hineinziehen, wechselt er automatisch in den Foto-Modus. Sie können aber auch jederzeit manuell
+  zwischen den Modi wechseln.
+</div>
+
+<hr class="trennlinie">
+
+<!-- ═══════════════════════════════════════ -->
+<h2>9. Foto einfügen</h2>
+
+<p>Es gibt zwei Möglichkeiten, ein Foto einzufügen. In beiden Fällen zeigt eine <strong>blaue Linie</strong>
+in der Vorschau genau an, wo das Foto landen wird.</p>
+
+<h3>Möglichkeit A – Drag &amp; Drop (einfachste Methode)</h3>
 
 <div class="schritt">
   <div class="schritt-zeile">
     <span class="nr">1</span>
-    <div class="schritt-text">Klicken Sie auf das Element, <em>nach dem</em> das Foto eingefügt werden soll (blauer Rahmen).</div>
+    <div class="schritt-text">Öffnen Sie den Windows-Datei-Explorer neben dem Browser-Fenster.</div>
   </div>
 </div>
-
 <div class="schritt">
   <div class="schritt-zeile">
     <span class="nr">2</span>
-    <div class="schritt-text">Klicken Sie auf <strong>🖼 Foto einfügen</strong>. Ein Dialogfenster öffnet sich.</div>
+    <div class="schritt-text">Ziehen Sie das gewünschte Foto-Bild direkt in die <strong>Vorschau</strong> des Editors.
+    Während des Ziehens erscheint eine <strong>leuchtend blaue Linie</strong>, die zeigt, wo das Foto eingefügt wird.</div>
   </div>
 </div>
-
 <div class="schritt">
   <div class="schritt-zeile">
     <span class="nr">3</span>
-    <div class="schritt-text">Klicken Sie auf <strong>„📷 Foto aus Dateimanager wählen …"</strong>. Es öffnet sich der normale Datei-Auswahl-Dialog Ihres Computers. Navigieren Sie zum Bild-Ordner Ihrer Website und wählen Sie das gewünschte Bild aus. Nach der Auswahl erscheint eine kleine Vorschau im Dialog.</div>
+    <div class="schritt-text">Lassen Sie die Maustaste los – der Foto-Dialog öffnet sich mit dem Bild bereits vorgeladen und einer Vorschau.</div>
   </div>
 </div>
-
 <div class="schritt">
   <div class="schritt-zeile">
     <span class="nr">4</span>
+    <div class="schritt-text">Passen Sie <strong>Breite</strong> und <strong>Bildbeschreibung</strong> an und klicken Sie auf <strong>✔ Einfügen</strong>.</div>
+  </div>
+</div>
+
+<h3>Möglichkeit B – über die Werkzeugleiste</h3>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">1</span>
+    <div class="schritt-text">Aktivieren Sie den <strong>📷 Foto-Modus</strong> (Button in der Werkzeugleiste).</div>
+  </div>
+</div>
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">2</span>
+    <div class="schritt-text">Klicken Sie in der Vorschau auf die Stelle, nach der das Foto eingefügt werden soll.
+    Eine <strong>blaue Linie</strong> erscheint und zeigt genau an, wohin das Foto kommt.
+    Sie können auf ein beliebiges Element klicken <em>oder</em> in einen leeren Bereich zwischen zwei Elementen.</div>
+  </div>
+</div>
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">3</span>
+    <div class="schritt-text">Klicken Sie auf <strong>🖼 Foto einfügen</strong>. Ein Dialogfenster öffnet sich.</div>
+  </div>
+</div>
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">4</span>
+    <div class="schritt-text">Klicken Sie auf <strong>„📷 Foto aus Dateimanager wählen …"</strong>. Es öffnet sich der normale Datei-Auswahl-Dialog Ihres Computers. Navigieren Sie zum Bild-Ordner Ihrer Website und wählen Sie das gewünschte Bild aus. Nach der Auswahl erscheint eine kleine Vorschau im Dialog.</div>
+  </div>
+</div>
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">5</span>
     <div class="schritt-text">Wählen Sie die gewünschte <strong>Breite</strong>:
       <ul>
         <li><strong>Volle Breite</strong> – Bild nimmt die volle Seitenbreite ein</li>
@@ -490,19 +622,17 @@ ein Bestandteil der Seite, z. B. ein Textabsatz, eine Überschrift, ein Bild ode
     </div>
   </div>
 </div>
-
 <div class="schritt">
   <div class="schritt-zeile">
-    <span class="nr">5</span>
+    <span class="nr">6</span>
     <div class="schritt-text">Geben Sie einen <strong>Alt-Text</strong> ein – eine kurze Beschreibung des Bildes, z. B. „Vereinstreffen im Saal".
     Das ist wichtig für blinde Nutzer und Suchmaschinen. Der Editor schlägt automatisch einen Text aus dem Dateinamen vor.</div>
   </div>
 </div>
-
 <div class="schritt">
   <div class="schritt-zeile">
-    <span class="nr">6</span>
-    <div class="schritt-text">Klicken Sie auf <strong>✔ Einfügen</strong>. Das Bild erscheint in der Vorschau an der gewünschten Stelle.</div>
+    <span class="nr">7</span>
+    <div class="schritt-text">Klicken Sie auf <strong>✔ Einfügen</strong>. Das Bild erscheint in der Vorschau genau an der durch die blaue Linie markierten Stelle.</div>
   </div>
 </div>
 
@@ -513,10 +643,15 @@ ein Bestandteil der Seite, z. B. ein Textabsatz, eine Überschrift, ein Bild ode
   dann manuell geprüft werden.
 </div>
 
+<div class="hinweis">
+  📌 <strong>Foto ans Ende:</strong> Mit <strong>🖼 Foto ans Ende</strong> fügen Sie ein Bild immer
+  ganz am Ende der Seite ein – unabhängig vom Modus und ohne vorherige Auswahl.
+</div>
+
 <hr class="trennlinie">
 
 <!-- ═══════════════════════════════════════ -->
-<h2>9. Foto ersetzen</h2>
+<h2>10. Foto ersetzen</h2>
 
 <p>Wenn Sie ein bereits eingefügtes Bild durch ein anderes ersetzen möchten, müssen Sie es nicht löschen und neu einfügen.</p>
 
@@ -557,7 +692,7 @@ ein Bestandteil der Seite, z. B. ein Textabsatz, eine Überschrift, ein Bild ode
 <hr class="trennlinie">
 
 <!-- ═══════════════════════════════════════ -->
-<h2>10. Hyperlink bearbeiten</h2>
+<h2>11. Hyperlink bearbeiten</h2>
 
 <p>Mit dem Hyperlink-Button können Sie einem Element einen Link hinzufügen – z. B. zu einer anderen
 Seite Ihrer Website oder zu einer externen Webseite.</p>
@@ -614,7 +749,7 @@ Seite Ihrer Website oder zu einer externen Webseite.</p>
 <hr class="trennlinie">
 
 <!-- ═══════════════════════════════════════ -->
-<h2>11. Datei speichern</h2>
+<h2>12. Datei speichern</h2>
 
 <div class="schritt">
   <div class="schritt-zeile">
@@ -645,15 +780,16 @@ Seite Ihrer Website oder zu einer externen Webseite.</p>
 </div>
 
 <div class="hinweis">
-  📌 <strong>Tipp bei Fehlern:</strong> Solange Sie nicht auf „💾 Speichern" geklickt haben,
-  können Sie die Originaldatei einfach erneut öffnen – alle Ihre Änderungen gehen dann verloren,
-  aber die Originaldatei ist unverändert.
+  📌 <strong>Tipp bei Fehlern:</strong> Nutzen Sie <strong>↩ Rückgängig</strong> (<span class="taste">Strg</span>+<span class="taste">Z</span>),
+  um Änderungen Schritt für Schritt zurückzunehmen, bevor Sie speichern.
+  Solange Sie nicht auf „💾 Speichern" geklickt haben, können Sie die Originaldatei auch einfach erneut öffnen –
+  alle Ihre Änderungen gehen dann verloren, aber die Originaldatei ist unverändert.
 </div>
 
 <hr class="trennlinie">
 
 <!-- ═══════════════════════════════════════ -->
-<h2>12. Schaltflächen-Übersicht</h2>
+<h2>13. Schaltflächen-Übersicht</h2>
 
 <table>
   <tr>
@@ -663,15 +799,18 @@ Seite Ihrer Website oder zu einer externen Webseite.</p>
   <tr><td><strong>📁 Arbeitspfad festlegen</strong></td><td>Website-Ordner auswählen – lädt CSS und Bilder für die Vorschau</td></tr>
   <tr><td><strong>📂 Öffnen</strong></td><td>Eine HTML-Datei laden und anzeigen</td></tr>
   <tr><td><strong>💾 Speichern</strong></td><td>Die bearbeitete Datei herunterladen (<span class="taste">Strg</span>+<span class="taste">S</span>)</td></tr>
+  <tr><td><strong>↩ Rückgängig</strong></td><td>Letzte Änderung rückgängig machen (<span class="taste">Strg</span>+<span class="taste">Z</span>), bis zu 20 Schritte</td></tr>
   <tr><td><strong>📋 Kopieren</strong></td><td>Ausgewähltes Element kopieren (<span class="taste">Strg</span>+<span class="taste">C</span>)</td></tr>
   <tr><td><strong>⧉ Duplizieren</strong></td><td>Ausgewähltes Element direkt darunter duplizieren (<span class="taste">Strg</span>+<span class="taste">D</span>)</td></tr>
   <tr><td><strong>📌 Einfügen</strong></td><td>Kopiertes Element nach dem ausgewählten einfügen (<span class="taste">Strg</span>+<span class="taste">V</span>)</td></tr>
   <tr><td><strong>↑ Hoch</strong></td><td>Ausgewähltes Element eine Position nach oben schieben</td></tr>
   <tr><td><strong>↓ Runter</strong></td><td>Ausgewähltes Element eine Position nach unten schieben</td></tr>
   <tr><td><strong>🗑 Löschen</strong></td><td>Ausgewähltes Element löschen (<span class="taste">Entf</span>)</td></tr>
-  <tr><td><strong>✏️ Text bearbeiten</strong></td><td>Text des ausgewählten Elements direkt bearbeiten</td></tr>
+  <tr><td><strong>✎ Text-Modus</strong></td><td>Wechselt in den Text-Modus – keine Foto-Positionslinien, ideal für Textbearbeitung</td></tr>
+  <tr><td><strong>📷 Foto-Modus</strong></td><td>Wechselt in den Foto-Modus – blaue Linie zeigt Einfügestelle für Fotos</td></tr>
+  <tr><td><strong>✏️ Text bearbeiten</strong></td><td>Text des ausgewählten Elements direkt bearbeiten (wechselt automatisch in Text-Modus)</td></tr>
   <tr><td><strong>🔗 Hyperlink</strong></td><td>Link auf das ausgewählte Element setzen oder bearbeiten</td></tr>
-  <tr><td><strong>🖼 Foto einfügen</strong></td><td>Ein Bild nach dem ausgewählten Element einfügen</td></tr>
+  <tr><td><strong>🖼 Foto einfügen</strong></td><td>Ein Bild an der markierten Stelle einfügen (wechselt automatisch in Foto-Modus)</td></tr>
   <tr><td><strong>🖼 Foto ersetzen</strong></td><td>Das ausgewählte Bild durch ein anderes ersetzen (nur aktiv bei Bild-Auswahl)</td></tr>
   <tr><td><strong>🖼 Foto ans Ende</strong></td><td>Ein Bild am Ende der Seite einfügen (immer verfügbar)</td></tr>
   <tr><td><strong>?</strong></td><td>Diese Bedienungsanleitung öffnen</td></tr>
@@ -680,7 +819,7 @@ Seite Ihrer Website oder zu einer externen Webseite.</p>
 <hr class="trennlinie">
 
 <!-- ═══════════════════════════════════════ -->
-<h2>13. Häufige Fragen</h2>
+<h2>14. Häufige Fragen</h2>
 
 <h3>Die Bilder werden in der Vorschau nicht angezeigt.</h3>
 <p>Der Arbeitspfad wurde wahrscheinlich nicht festgelegt. Gehen Sie so vor:
@@ -697,7 +836,14 @@ auf den Hauptordner der Website zeigt, in dem auch die CSS-Dateien liegen.</p>
 <h3>Der Button „Foto ersetzen" ist ausgegraut.</h3>
 <p>Der Button ist nur aktiv, wenn ein Bild (<code>&lt;img&gt;</code>) ausgewählt ist.
 Klicken Sie zuerst auf das Bild in der Vorschau – es muss den blauen Auswahlrahmen bekommen.
-Danach wird der Button aktiv.</p>
+Danach wird der Button aktiv. Stellen Sie außerdem sicher, dass Sie sich im <strong>Foto-Modus</strong> befinden
+oder klicken Sie direkt auf „🖼 Foto ersetzen" – der Editor wechselt dann automatisch.</p>
+
+<h3>Wozu brauche ich Text-Modus und Foto-Modus?</h3>
+<p>Die zwei Modi verhindern, dass sich Textbearbeitung und Foto-Einfügen gegenseitig stören.
+Im <strong>Text-Modus</strong> sehen Sie keine ablenkenden blauen Positionslinien – ideal zum ruhigen Arbeiten
+an Texten. Im <strong>Foto-Modus</strong> zeigt die blaue Linie jederzeit genau an, wo das nächste Foto landen wird.
+Der Editor wechselt automatisch in den richtigen Modus, wenn Sie auf die entsprechenden Buttons klicken.</p>
 
 <h3>Ich kann keinen Hyperlink auf ein Bild setzen – geht das?</h3>
 <p>Ja, das geht. Klicken Sie auf das Bild (blauer Rahmen), dann auf „🔗 Hyperlink".
@@ -709,9 +855,11 @@ der Editor den Pfad automatisch. Bei externen Links prüfen Sie, ob die Adresse 
 (z. B. <em>https://www.example.de</em>). Vergewissern Sie sich außerdem, dass die verlinkte
 Datei tatsächlich im richtigen Ordner auf dem Server liegt.</p>
 
-<h3>Ich habe versehentlich etwas gelöscht.</h3>
-<p>Schließen Sie die Datei <strong>ohne zu speichern</strong> und öffnen Sie die Originaldatei erneut.
-Solange Sie nicht auf „💾 Speichern" geklickt haben, ist die Originaldatei unverändert.</p>
+<h3>Ich habe versehentlich etwas gelöscht oder falsch bearbeitet.</h3>
+<p>Klicken Sie auf <strong>↩ Rückgängig</strong> in der Werkzeugleiste – oder drücken Sie
+<span class="taste">Strg</span>+<span class="taste">Z</span>. Sie können bis zu 20 Schritte zurückgehen.
+Solange Sie nicht auf „💾 Speichern" geklickt haben, können Sie die Originaldatei auch einfach
+erneut öffnen – alle Änderungen gehen dann verloren, aber die Originaldatei ist unverändert.</p>
 
 <h3>Umlaute (ä, ö, ü, ß) werden komisch angezeigt.</h3>
 <p>Stellen Sie sicher, dass die HTML-Datei oben im Code den Eintrag
@@ -726,7 +874,7 @@ Leeren Sie danach den Browser-Cache, falls die Seite noch das alte Aussehen zeig
 
 <div class="seitenende">
   Bedienungsanleitung für den HTML Editor &nbsp;&middot;&nbsp;
-  Erstellt mit Cortex AI Solutions &amp; Claude Sonnet 4.6 &nbsp;&middot;&nbsp; April 2026
+  Cortex AI Solutions &amp; Claude Sonnet 4.6 &nbsp;&middot;&nbsp; Mai 2026
 </div>
 
 </body>

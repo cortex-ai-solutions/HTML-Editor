@@ -175,6 +175,7 @@
   <button onclick="openFolder()" id="btn-folder" title="Den Ordner Ihrer Website festlegen &#8211; damit Bilder und CSS-Stile geladen werden k&#246;nnen">&#128193; Arbeitspfad festlegen</button>
   <button onclick="openFile()">&#128194; &#214;ffnen</button>
   <button onclick="saveFile()" id="btn-save">&#128190; Speichern</button>
+  <button onclick="undo()" id="btn-undo" disabled title="Strg+Z">&#8617; R&#252;ckg&#228;ngig</button>
   <button onclick="loadDemo()">&#8635; Beispiel</button>
   <div class="sep"></div>
   <button onclick="copyEl()" id="btn-copy" disabled>&#128203; Kopieren</button>
@@ -186,7 +187,10 @@
   <div class="sep"></div>
   <button onclick="deleteEl()" id="btn-del" disabled class="danger">&#128465; L&#246;schen</button>
   <div class="sep"></div>
-  <button onclick="startEdit()" id="btn-edit" disabled class="primary">&#9999;&#65039; Text bearbeiten</button>
+  <button onclick="setMode('text')" id="btn-mode-text" class="primary" title="Text-Modus: Textelemente bearbeiten &#8211; keine Foto-Positionierungslinien">&#9998; Text-Modus</button>
+  <button onclick="setMode('photo')" id="btn-mode-photo" title="Foto-Modus: Blaue Linie zeigt Einfügestelle f&#252;r Fotos">&#128247; Foto-Modus</button>
+  <div class="sep"></div>
+  <button onclick="startEdit()" id="btn-edit" disabled>&#9999;&#65039; Text bearbeiten</button>
   <button onclick="openLinkDialog()" id="btn-link" disabled>&#128279; Hyperlink</button>
   <div class="sep"></div>
   <button onclick="openPhotoDialog('after')" id="btn-photo" disabled>&#128444; Foto einf&#252;gen</button>
@@ -308,7 +312,7 @@
   </div>
   <div class="panel hidden" id="panel-preview">
     <div class="panel-header">
-      <span>&#128070; Einmal klicken = ausw&#228;hlen &nbsp;|&nbsp; Doppelklick = Text bearbeiten</span>
+      <span>&#128070; Einmal klicken = ausw&#228;hlen &nbsp;|&nbsp; Doppelklick = Text bearbeiten &nbsp;|&nbsp; &#128247; Foto: einfach reinziehen</span>
       <span id="preview-filename" style="color:#38bdf8"></span>
     </div>
     <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin" title="Vorschau"></iframe>
@@ -340,6 +344,7 @@ let blobMap      = {}, currentImgFile = null, currentBlobUrl = null, imgInsertMo
 let folderFileMap = {}, cssCache = {}, previewBlobUrls = [];
 let folderFileList = [], htmlDirInFolder = '', currentImgRelPath = '', currentFolderName = '';
 let linkType = 'internal', pickedLinkPath = '';
+let undoStack = [], insertAfterWid = undefined, pendingPhotoMode = null, editorMode = 'text';
 
 const DEMO_HTML = `<!DOCTYPE html>
 <html lang="de">
@@ -423,15 +428,24 @@ async function buildIframe(html) {
     doc.head.appendChild(style);
     const script = doc.createElement('script');
     script.textContent = `(function(){
-      var cur=null,editing=null;
+      var cur=null,editing=null,editorMode='${editorMode}';
+      var BLOCKS={DIV:1,P:1,H1:1,H2:1,H3:1,H4:1,H5:1,H6:1,UL:1,OL:1,LI:1,TABLE:1,TBODY:1,TR:1,TD:1,TH:1,SECTION:1,ARTICLE:1,HEADER:1,FOOTER:1,NAV:1,ASIDE:1,FIGURE:1,BLOCKQUOTE:1,PRE:1,FORM:1,IMG:1};
+      function nearestBlock(el){
+        while(el&&el!==document.body){
+          if(el.hasAttribute('data-wid')&&BLOCKS[el.tagName])return el;
+          el=el.parentElement;
+        }
+        return null;
+      }
       document.addEventListener('click',function(e){
         if(editing)return;
-        var t=e.target;
-        while(t&&!t.hasAttribute('data-wid'))t=t.parentElement;
-        if(!t||t===document.body)return;
+        var t=nearestBlock(e.target);
+        if(!t)return;
         e.preventDefault();e.stopPropagation();
+        hideInsCursor();
         if(cur)cur.classList.remove('wsel');
         cur=t;t.classList.add('wsel');
+        if(editorMode==='photo')showInsCursor(t);
         window.parent.postMessage({type:'ws',wid:t.getAttribute('data-wid'),tag:t.tagName.toLowerCase(),
           cls:(t.getAttribute('class')||'').replace('wsel','').trim(),outerHTML:t.outerHTML,
           preview:t.textContent.trim().slice(0,100)},'*');
@@ -439,7 +453,7 @@ async function buildIframe(html) {
       document.addEventListener('dblclick',function(e){
         var t=e.target;
         while(t&&!t.hasAttribute('data-wid'))t=t.parentElement;
-        if(!t||t===document.body)return;
+        if(!t||t===document.body||t.tagName==='IMG')return;
         e.preventDefault();e.stopPropagation();startEditing(t);
       },true);
       function startEditing(el){
@@ -473,14 +487,88 @@ async function buildIframe(html) {
           var el=document.querySelector('[data-wid="'+e.data.wid+'"]');
           if(el)startEditing(el);
         }
+        if(e.data&&e.data.type==='wstopedit'){stopEditing(e.data.save!==false);}
+        if(e.data&&e.data.type==='wsetmode'){editorMode=e.data.mode;if(editorMode==='text')hideInsCursor();}
       });
+      var insCursor=null;
+      function getBodyBlocks(){
+        return Array.from(document.body.children).filter(function(c){
+          return c.hasAttribute('data-wid')&&c.tagName!=='SCRIPT'&&c.tagName!=='STYLE';
+        });
+      }
+      function blockAboveY(y){
+        var ch=getBodyBlocks(),above=null;
+        for(var i=0;i<ch.length;i++){
+          var r=ch[i].getBoundingClientRect();
+          if(r.top+r.height/2<y)above=ch[i];
+        }
+        return above;
+      }
+      function showInsCursor(afterEl){
+        if(insCursor)insCursor.remove();
+        document.body.style.position='relative';
+        insCursor=document.createElement('div');
+        insCursor.style.cssText='position:absolute;left:0;right:0;height:2px;background:#38bdf8;border-radius:2px;pointer-events:none;z-index:100;box-shadow:0 0 6px rgba(56,189,248,0.7);';
+        var sy=window.scrollY||document.documentElement.scrollTop||0;
+        if(afterEl){
+          var r=afterEl.getBoundingClientRect();insCursor.style.top=(r.bottom+sy+2)+'px';
+        } else {
+          var ch=getBodyBlocks();
+          if(ch[0]){var r=ch[0].getBoundingClientRect();insCursor.style.top=Math.max(0,r.top+sy-4)+'px';}
+          else insCursor.style.top='0px';
+        }
+        document.body.appendChild(insCursor);
+      }
+      function hideInsCursor(){if(insCursor){insCursor.remove();insCursor=null;}}
       document.addEventListener('click',function(e){
         if(editing)return;
         if(!e.target.hasAttribute('data-wid')&&!e.target.closest('[data-wid]')){
           if(cur){cur.classList.remove('wsel');cur=null;}
-          window.parent.postMessage({type:'wdesel'},'*');
+          if(editorMode==='photo'){
+            var above=blockAboveY(e.clientY);
+            showInsCursor(above);
+            window.parent.postMessage({type:'winsertpoint',afterWid:above?above.getAttribute('data-wid'):null},'*');
+          }else{
+            window.parent.postMessage({type:'wdesel'},'*');
+          }
         }
       });
+      var dropLine=null,lastDT=null,lastDP=null;
+      document.addEventListener('dragover',function(e){
+        if(!Array.from(e.dataTransfer.types).includes('Files'))return;
+        e.preventDefault();e.dataTransfer.dropEffect='copy';
+        var tgt=nearestBlock(e.target);if(!tgt)return;
+        var rect=tgt.getBoundingClientRect();
+        var pos=e.clientY<rect.top+rect.height/2?'before':'after';
+        if(lastDT===tgt&&lastDP===pos)return;
+        lastDT=tgt;lastDP=pos;
+        if(dropLine)dropLine.remove();
+        dropLine=document.createElement('div');
+        dropLine.style.cssText='position:fixed;left:0;right:0;height:3px;background:#38bdf8;z-index:9999;pointer-events:none;box-shadow:0 0 8px #38bdf8;';
+        dropLine.style.top=(pos==='before'?rect.top:rect.bottom)+'px';
+        document.body.appendChild(dropLine);
+      },false);
+      document.addEventListener('dragleave',function(e){
+        if(!e.relatedTarget||!document.body.contains(e.relatedTarget)){
+          if(dropLine){dropLine.remove();dropLine=null;}
+          lastDT=null;lastDP=null;
+        }
+      },false);
+      document.addEventListener('drop',function(e){
+        if(dropLine){dropLine.remove();dropLine=null;}
+        e.preventDefault();
+        var files=e.dataTransfer.files;
+        if(!files||!files.length)return;
+        var file=files[0];
+        if(!file.type.startsWith('image/'))return;
+        var tgt=nearestBlock(e.target)||blockAboveY(e.clientY);
+        var rect=tgt?tgt.getBoundingClientRect():null;
+        var pos=rect&&e.clientY<rect.top+rect.height/2?'before':'after';
+        var wid=tgt?tgt.getAttribute('data-wid'):null;
+        if(cur)cur.classList.remove('wsel');
+        cur=tgt;if(tgt)tgt.classList.add('wsel');
+        window.parent.postMessage({type:'wdrop',wid:wid,pos:pos,file:file},'*');
+      },false);
     })();`;
     doc.body.appendChild(script);
     return '<!DOCTYPE html>'+doc.documentElement.outerHTML;
@@ -494,17 +582,20 @@ function cleanDoc(doc){
   doc.querySelectorAll('style').forEach(s=>{if(s.textContent.includes('data-wid'))s.remove();});
   doc.querySelectorAll('script').forEach(s=>{if(s.textContent.includes('postMessage'))s.remove();});
 }
-function doManipulate(fn){
+function doManipulate(fn,widOverride){
   if(!currentHtml)return;
+  pushUndo();
   const doc=new DOMParser().parseFromString(currentHtml,'text/html');
   let c=0;doc.body.querySelectorAll('*').forEach(el=>el.setAttribute('data-wid',++c));
-  const el=selectedWid?doc.querySelector('[data-wid="'+selectedWid+'"]'):null;
+  const wid=widOverride!==undefined?widOverride:selectedWid;
+  const el=wid?doc.querySelector('[data-wid="'+wid+'"]'):null;
   fn(doc,el);cleanDoc(doc);
   currentHtml='<!DOCTYPE html>'+doc.documentElement.outerHTML;
   clearSelection();refresh();
 }
 function doManipulateRaw(fn){
   if(!currentHtml)return;
+  pushUndo();
   const doc=new DOMParser().parseFromString(currentHtml,'text/html');
   fn(doc);cleanDoc(doc);
   currentHtml='<!DOCTYPE html>'+doc.documentElement.outerHTML;
@@ -525,9 +616,10 @@ function moveDown(){doManipulate((doc,el)=>{if(el&&el.nextElementSibling)el.pare
 // BUG-FIX 1: Guard gegen leere Auswahl
 function startEdit(){
   if(!selectedWid)return;
+  setMode('text');
   document.getElementById('preview-frame').contentWindow.postMessage({type:'wstartedit',wid:selectedWid},'*');
 }
-function applyCode(){currentHtml=document.getElementById('code-editor').value;clearSelection();refresh();flash('Code \u00FCbernommen');}
+function applyCode(){pushUndo();currentHtml=document.getElementById('code-editor').value;clearSelection();refresh();flash('Code \u00FCbernommen');}
 
 // ── Hyperlink-Dialog ──────────────────────────────
 function openLinkDialog(){
@@ -658,6 +750,12 @@ function extractSelectedDimensions(){
 }
 
 function openPhotoDialog(mode){
+  setMode('photo');
+  if(document.getElementById('btn-edit').classList.contains('edit-active')){
+    document.getElementById('preview-frame').contentWindow.postMessage({type:'wstopedit',save:false},'*');
+    document.getElementById('btn-edit').classList.remove('edit-active');
+    document.getElementById('btn-edit').textContent='✏️ Text bearbeiten';
+  }
   imgInsertMode=mode; currentImgFile=null; currentImgRelPath='';
   if(currentBlobUrl){URL.revokeObjectURL(currentBlobUrl);currentBlobUrl=null;}
   document.getElementById('dlg-alt').value='';
@@ -685,12 +783,10 @@ function refreshPhotoDialog(){
   document.getElementById('dlg-path-warn').style.display='none';
 }
 
-function onFilePickerImage(input){
-  const file=input.files[0]; if(!file)return;
+function loadImageFile(file){
   if(currentBlobUrl)URL.revokeObjectURL(currentBlobUrl);
   currentImgFile=file;
   currentBlobUrl=URL.createObjectURL(file);
-  // Relativen Pfad aus folderFileMap ermitteln (nach Name + Gr\u00F6\u00DFe)
   const match=folderFileList.find(({relPath})=>{
     const f=folderFileMap[relPath];
     return f&&f.name===file.name&&f.size===file.size;
@@ -706,10 +802,20 @@ function onFilePickerImage(input){
   document.getElementById('dlg-rel-path').textContent=finalPath||file.name;
   document.getElementById('dlg-rel-path').style.color=found?'#4ade80':'#fbbf24';
   document.getElementById('btn-confirm-photo').disabled=false;
+}
+function onFilePickerImage(input){
+  const file=input.files[0]; if(!file)return;
+  loadImageFile(file);
   input.value='';
 }
 
 function closePhotoDialog(){document.getElementById('photo-overlay').style.display='none';}
+function openPhotoDrop(file,wid,pos){
+  selectedWid=wid;
+  selectedInfo={wid:wid,tag:'div',outerHTML:'',preview:''};
+  openPhotoDialog(pos==='before'?'before':'after');
+  loadImageFile(file);
+}
 
 function confirmPhoto(){
   if(!currentImgFile||!currentBlobUrl)return;
@@ -725,12 +831,23 @@ function confirmPhoto(){
   }
   blobMap[currentBlobUrl]=finalPath;
   const imgTag='<img src="'+currentBlobUrl+'" alt="'+alt+'" style="'+widthStyle+' display:block; margin:12px 0;" onerror="this.style.display=\'none\'">';
+  currentBlobUrl=null; // URL ist jetzt in blobMap/imgTag – NICHT widerrufen, sonst wird das Foto unsichtbar
   closePhotoDialog();
   if(imgInsertMode==='replace') doManipulate((doc,el)=>{
     if(el){const tmp=doc.createElement('div');tmp.innerHTML=imgTag;el.parentNode.replaceChild(tmp.firstElementChild,el);}
   });
   else if(imgInsertMode==='end') doManipulateRaw(doc=>doc.body.insertAdjacentHTML('beforeend',imgTag));
-  else doManipulate((doc,el)=>{if(el)el.insertAdjacentHTML('afterend',imgTag);else doc.body.insertAdjacentHTML('beforeend',imgTag);});
+  else if(imgInsertMode==='before'){
+    const wid=insertAfterWid!==undefined?insertAfterWid:selectedWid;insertAfterWid=undefined;
+    doManipulate((doc,el)=>{if(el)el.insertAdjacentHTML('beforebegin',imgTag);else doc.body.insertAdjacentHTML('afterbegin',imgTag);},wid);
+  }
+  else{
+    const wid=insertAfterWid!==undefined?insertAfterWid:selectedWid;insertAfterWid=undefined;
+    doManipulate((doc,el)=>{
+      if(el) el.insertAdjacentHTML('afterend',imgTag);
+      else doc.body.insertAdjacentHTML('beforeend',imgTag);
+    },wid);
+  }
   flash('Foto '+(imgInsertMode==='replace'?'ersetzt':'eingef\u00FCgt')+': '+finalPath);
 }
 
@@ -768,6 +885,7 @@ function onFileChosen(e){
   const file=e.target.files[0]; if(!file)return;
   const reader=new FileReader();
   reader.onload=ev=>{
+    undoStack=[];document.getElementById('btn-undo').disabled=true;
     currentHtml=ev.target.result; currentFile=file.name; blobMap={};
     document.getElementById('preview-filename').textContent=file.name;
     document.getElementById('ib-file').textContent=file.name;
@@ -798,6 +916,7 @@ function saveFile(){
 }
 
 function loadDemo(){
+  undoStack=[];document.getElementById('btn-undo').disabled=true;
   currentHtml=DEMO_HTML; currentFile='demo.html'; blobMap={};
   document.getElementById('preview-filename').textContent='demo.html (Beispiel)';
   clearSelection();showEditor();refresh();
@@ -835,8 +954,9 @@ function clearSelection(){selectedWid=null;selectedInfo=null;updateUI();}
 
 function updateUI(){
   const hasSel=!!selectedWid, hasClip=!!clipboard;
-  ['btn-copy','btn-dup','btn-up','btn-down','btn-del','btn-edit','btn-photo']
+  ['btn-copy','btn-dup','btn-up','btn-down','btn-del','btn-edit']
     .forEach(id=>document.getElementById(id).disabled=!hasSel);
+  document.getElementById('btn-photo').disabled=!currentHtml;
   document.getElementById('btn-paste').disabled=!hasSel||!hasClip;
   const isImg=hasSel&&selectedInfo&&selectedInfo.tag==='img';
   document.getElementById('btn-photo-replace').disabled=!isImg;
@@ -854,6 +974,28 @@ function updateUI(){
   clipEl.classList.toggle('hidden',!hasClip);
 }
 
+function setMode(mode){
+  editorMode=mode;
+  document.getElementById('btn-mode-text').className=mode==='text'?'primary':'';
+  document.getElementById('btn-mode-photo').className=mode==='photo'?'primary':'';
+  if(mode==='text'){insertAfterWid=undefined;}
+  try{document.getElementById('preview-frame').contentWindow.postMessage({type:'wsetmode',mode},'*');}catch(e){}
+}
+
+function pushUndo(){
+  if(!currentHtml)return;
+  undoStack.push(currentHtml);
+  if(undoStack.length>20)undoStack.shift();
+  document.getElementById('btn-undo').disabled=false;
+}
+function undo(){
+  if(!undoStack.length)return;
+  currentHtml=undoStack.pop();
+  document.getElementById('btn-undo').disabled=undoStack.length===0;
+  clearSelection();refresh();
+  flash('Rückgängig gemacht');
+}
+
 function flash(msg){
   const el=document.getElementById('status-flash');
   el.textContent=msg;el.classList.remove('hidden');
@@ -864,8 +1006,10 @@ function flash(msg){
 // ── Nachrichten vom iframe ────────────────────────
 window.addEventListener('message',function(e){
   if(!e.data)return;
-  if(e.data.type==='ws'){selectedWid=e.data.wid;selectedInfo=e.data;updateUI();}
-  if(e.data.type==='wdesel'){clearSelection();}
+  if(e.data.type==='ws'){selectedWid=e.data.wid;selectedInfo=e.data;insertAfterWid=editorMode==='photo'?e.data.wid:undefined;updateUI();}
+  if(e.data.type==='wdesel'){insertAfterWid=undefined;clearSelection();}
+  if(e.data.type==='winsertpoint'){insertAfterWid=e.data.afterWid;clearSelection();if(currentHtml)document.getElementById('btn-photo').disabled=false;}
+  if(e.data.type==='wdrop'&&e.data.file)openPhotoDrop(e.data.file,e.data.wid,e.data.pos);
   if(e.data.type==='weditstart'){
     document.getElementById('btn-edit').classList.add('edit-active');
     document.getElementById('btn-edit').textContent='\u270F\uFE0F Wird bearbeitet \u2026';
@@ -878,6 +1022,7 @@ window.addEventListener('message',function(e){
     let c=0;doc.body.querySelectorAll('*').forEach(el=>el.setAttribute('data-wid',++c));
     const el=doc.querySelector('[data-wid="'+e.data.wid+'"]');
     if(el){
+      pushUndo();
       el.innerHTML=e.data.innerHTML;cleanDoc(doc);
       currentHtml='<!DOCTYPE html>'+doc.documentElement.outerHTML;
       document.getElementById('code-editor').value=currentHtml;
@@ -890,6 +1035,7 @@ window.addEventListener('message',function(e){
 document.addEventListener('keydown',function(e){
   if(['TEXTAREA','INPUT','SELECT'].includes(e.target.tagName))return;
   if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveFile();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();undo();}
   if((e.ctrlKey||e.metaKey)&&e.key==='c'){if(selectedWid){e.preventDefault();copyEl();}}
   if((e.ctrlKey||e.metaKey)&&e.key==='v'){if(selectedWid&&clipboard){e.preventDefault();pasteEl();}}
   if((e.ctrlKey||e.metaKey)&&e.key==='d'){if(selectedWid){e.preventDefault();duplicateEl();}}
