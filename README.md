@@ -10,10 +10,14 @@ Built by [Cortex AI Solutions](https://www.cortex-ai.de/).
 
 Load a local HTML file, edit it visually, and save it back — without touching source code. Designed for non-technical users who maintain static websites.
 
-- **Click** any element to select it
+- **Click** any element to select it (smart block-level selection)
 - **Double-click** to edit text inline
 - **Insert, replace, move, copy or delete** elements via toolbar
-- **Insert or replace images** from your local file system
+- **Undo** any change — up to 20 steps (Strg+Z)
+- **Two modes** — Text Mode for editing, Photo Mode for image placement
+- **Insert images** via drag & drop from Windows Explorer or via toolbar
+- **Blue insertion cursor** shows exactly where a photo will land before confirming
+- **Replace images** with one click when an image is selected
 - **Set hyperlinks** — internal pages or external URLs, with automatic relative-path calculation
 - **Live preview** with correct CSS styling and images (via folder loading)
 - **Save** downloads the edited file, original `<link>` tags preserved
@@ -26,7 +30,8 @@ Load a local HTML file, edit it visually, and save it back — without touching 
 2. Open it with any modern browser (Chrome, Edge, Firefox)
 3. Click **📁 Arbeitspfad festlegen** → select your website folder (loads CSS + images)
 4. Click **📂 Öffnen** → open an HTML file from that folder
-5. Edit visually → **💾 Speichern** to download
+5. Choose mode: **✎ Text-Modus** for text editing, **📷 Foto-Modus** for inserting photos
+6. Edit visually → **💾 Speichern** to download
 
 > The UI is currently in German. An English version is not planned at this time.
 
@@ -43,7 +48,13 @@ Load a local HTML file, edit it visually, and save it back — without touching 
 | Folder access | `<input webkitdirectory>` — works in Chrome, Edge, Firefox |
 | Inline editing | `contentEditable` inside the iframe |
 | HTML parsing | `DOMParser` — no regex on markup |
-| Save integrity | Original `<link>` tags and image paths preserved in saved file |
+| Block selection | `nearestBlock()` walks up the DOM to the first meaningful block element |
+| Photo insertion | Blob URL lifecycle managed via `blobMap`; URLs survive multiple insertions |
+| Drag & drop | `dragover`/`drop` events in iframe → `postMessage` to parent with `File` object |
+| Insertion cursor | Blue line rendered in iframe via `position:absolute` div, updated on click/drag |
+| Two-mode system | `editorMode` embedded in iframe script at build time; updated via `postMessage` |
+| Undo | `undoStack` array (max 20), saves `currentHtml` snapshots before each mutation |
+| Save integrity | Original `<link>` tags and image paths preserved; Blob URLs replaced before download |
 | Encoding | UTF-8 read and write |
 
 ---
@@ -54,7 +65,7 @@ Load a local HTML file, edit it visually, and save it back — without touching 
 |---|---|
 | `HTML-Editor.html` | The editor — this is the only file you need |
 | `Bedienungsanleitung-HTML-Editor.html` | Step-by-step user guide (German) |
-| `documentation.md` | Development log (14 build steps, German) |
+| `documentation.md` | Development log (German) |
 
 ---
 
@@ -73,4 +84,4 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ## Background
 
-Originally developed for the [Südthüringer Literaturverein](https://holgeuske.de) to allow non-technical staff to maintain their static HTML website without a code editor. Iterated over 14 development sessions with Claude (Anthropic).
+Originally developed for the [Südthüringer Literaturverein](https://holgeuske.de) to allow non-technical staff to maintain their static HTML website without a code editor. Iterated over multiple development sessions with Claude (Anthropic).

@@ -1,6 +1,6 @@
 # HTML Editor – Entwicklungsprotokoll
 
-*Erstellt mit Claude (claude.ai) – April 2026*
+*Erstellt mit Claude (claude.ai) – April/Mai 2026*
 
 ---
 
@@ -116,14 +116,64 @@ Ziel war ein einfacher WYSIWYG-Editor für HTML-Seiten, der **ohne Installation*
 - Klick öffnet die Datei `Bedienungsanleitung-HTML-Editor.html` in einem neuen Browser-Tab
 - Branding ist dezent gehalten und stört die Bedienung nicht
 
+### Schritt 15 – Foto-Dialog auf Dateimanager umgestellt
+- Das Dropdown-Menü (Schritt 10) wurde durch einen **Dateimanager-Button** ersetzt
+- Nutzer wählt Bild direkt aus dem Dateisystem statt aus einem Dropdown
+- Relative Pfadberechnung erfolgt weiterhin automatisch via `folderFileMap`-Abgleich nach Name und Dateigröße
+- Warnung wenn das Bild nicht im Arbeitspfad gefunden wird
+
+### Schritt 16 – Block-Selektion & Drag-and-Drop für Fotos
+- **Block-Selektion neu implementiert** (`nearestBlock()`): Klick auf ein beliebiges Element wählt jetzt das nächste sinnvolle Block-Element (`div`, `p`, `h1–h6`, `img`, etc.) aus – kein willkürliches Auswählen von `<span>` oder `<a>` mehr
+- `<img>`-Elemente sind direkt selektierbar (kein Bubbling zum Container)
+- Doppelklick auf `<img>` startet keine Texteditierung mehr
+- **Drag & Drop**: Bilder aus dem Windows-Explorer direkt in die Vorschau ziehen
+  - Leuchtend blaue Drop-Linie zeigt Einfügestelle (Vor/Nach-Erkennung per Maus-Y-Position)
+  - Drop-Event sendet `File`-Objekt via `postMessage` an den Parent
+  - Foto-Dialog öffnet sich automatisch mit vorgeladenem Bild
+- `loadImageFile(file)` als gemeinsame Hilfsfunktion für Dateidialog und Drag & Drop
+
+### Schritt 17 – Rückgängig-Funktion (Undo)
+- **↩ Rückgängig**-Button in der Toolbar (Tastenkürzel `Strg+Z`)
+- `undoStack`-Array speichert bis zu 20 Snapshots von `currentHtml`
+- `pushUndo()` wird vor jeder DOM-Manipulation aufgerufen (`doManipulate`, `doManipulateRaw`, `applyCode`, `weditdone`)
+- Stack wird beim Laden einer neuen Datei geleert
+- Button ist ausgegraut wenn Stack leer
+
+### Schritt 18 – Einfüge-Cursor & verbesserte Foto-Positionierung
+- **Blaue Cursor-Linie** im iframe zeigt Einfügepunkt für Fotos
+  - Klick auf ein Element → Cursor nach dem Element
+  - Klick in leere Fläche → Cursor zwischen den nächsten Elementen (`blockAboveY()`)
+  - Drag & Drop → Drop-Linie als Cursor
+- `insertAfterWid`-State im Parent trackt den Einfügepunkt unabhängig von `selectedWid`
+- `doManipulate(fn, widOverride)` akzeptiert optionalen Wid-Parameter für präzise Positionierung
+- „Foto einfügen"-Button immer aktiv sobald Dokument geladen (nicht mehr von Selektion abhängig)
+- Blob-URL-Lebenszyklus: nach `confirmPhoto()` wird `currentBlobUrl = null` gesetzt (ohne Widerruf), sodass spätere `openPhotoDialog()`-Aufrufe die URL nicht fälschlicherweise widerrufen
+- Edit-Modus wird beim Öffnen des Foto-Dialogs via `wstopedit`-Message sauber beendet (mit `save:false` um Blob-URL-Kontamination zu vermeiden)
+
+### Schritt 19 – Text-Modus / Foto-Modus
+- Zwei explizite **Arbeitsmodi** in der Toolbar: **✎ Text-Modus** und **📷 Foto-Modus**
+- `editorMode`-Variable im Parent, bei `buildIframe()` per Template-Literal in den iframe-Script eingebettet; Live-Updates via `wsetmode`-postMessage
+- **Text-Modus** (Standard):
+  - Kein Einfüge-Cursor bei Elementklicks
+  - Klick in leere Fläche → deselektieren (kein `winsertpoint`)
+  - `insertAfterWid` bleibt `undefined`
+- **Foto-Modus**:
+  - Einfüge-Cursor erscheint nach jedem Elementklick
+  - Klick in leere Fläche → Cursor setzt Einfügepunkt
+  - `insertAfterWid = selectedWid` nach `ws`-Message
+- **Automatischer Moduswechsel**:
+  - `startEdit()` → Text-Modus
+  - `openPhotoDialog()` → Foto-Modus
+- Bedienungsanleitung vollständig aktualisiert (neue Abschnitte: Rückgängig, Modi, Drag & Drop)
+
 ---
 
 ## Begleitend entstandene Dokumente
 
 | Datei | Inhalt |
 |-------|--------|
-| `HTML-Editor.html` | Der fertige Editor (Standalone, ~1.500 Zeilen) |
-| `Bedienungsanleitung-HTML-Editor.html` | Schritt-für-Schritt-Anleitung für Einsteiger |
+| `HTML-Editor.html` | Der fertige Editor (Standalone, ~1.100 Zeilen) |
+| `Bedienungsanleitung-HTML-Editor.html` | Schritt-für-Schritt-Anleitung für Einsteiger (14 Abschnitte) |
 | `documentation.md` | Dieses Entwicklungsprotokoll |
 
 ---
@@ -134,15 +184,19 @@ Ziel war ein einfacher WYSIWYG-Editor für HTML-Seiten, der **ohne Installation*
 - **iframe-Isolation** mit `postMessage` für sichere Kommunikation zwischen Editor und Vorschau
 - **contentEditable** für direkte Textbearbeitung im iframe
 - **DOMParser** für saubere HTML-Manipulation ohne Regex
-- **File System Access API** (`showDirectoryPicker`) zum Laden ganzer Ordner inkl. Unterordner
+- **File System Access API** (`<input webkitdirectory>`) zum Laden ganzer Ordner inkl. Unterordner
 - **folderFileMap** (Map): speichert alle Dateien des Website-Ordners als `File`-Objekte, Schlüssel = relativer Pfad
 - **CSS-Inlining** für Vorschau: `<link rel="stylesheet">`-Tags werden erkannt, CSS inline eingebettet; gespeicherte Datei behält originale `<link>`-Tags
-- **Blob-URLs** für Bildvorschau: relative `src`-Attribute werden im iframe durch temporäre `blob:`-URLs ersetzt
+- **Blob-URLs** für Bildvorschau: relative `src`-Attribute werden im iframe durch temporäre `blob:`-URLs ersetzt; Blob-URL-Lebenszyklus sorgfältig verwaltet (`blobMap`, `previewBlobUrls`, kein vorzeitiger Widerruf)
+- **nearestBlock(el)**: traversiert den DOM nach oben bis zum nächsten Block-Element (DIV, P, H1–H6, IMG, etc.), macht die Auswahl vorhersehbar
+- **insertAfterWid**: separater State für den Foto-Einfügepunkt, unabhängig von der Element-Selektion (`selectedWid`)
+- **editorMode**: wird beim `buildIframe()`-Aufruf per Template-Literal in den iframe-Script eingebettet; live per `wsetmode`-postMessage aktualisierbar
+- **undoStack**: Array mit bis zu 20 `currentHtml`-Snapshots, wird vor jeder Mutation befüllt
 - **relativePathTo(from, to)**: berechnet relativen Pfad zwischen zwei absoluten Dateipfaden (unterstützt beliebige Ordnertiefen und Unterordner)
 - **localStorage** zum Speichern des HTML-Dateipfads zwischen Sitzungen
 - **UTF-8** beim Speichern (korrekte Darstellung von Umlauten und ß)
-- Tastaturkürzel: `Strg+S` (Speichern), `Strg+C/V` (Kopieren/Einfügen), `Strg+D` (Duplizieren), `Entf` (Löschen)
+- Tastaturkürzel: `Strg+S` (Speichern), `Strg+Z` (Rückgängig), `Strg+C/V` (Kopieren/Einfügen), `Strg+D` (Duplizieren), `Entf` (Löschen)
 
 ---
 
-*Entwickelt im Gespräch mit Claude Sonnet 4.6 auf claude.ai – April 2026*
+*Entwickelt im Gespräch mit Claude Sonnet 4.6 auf claude.ai – April/Mai 2026*
