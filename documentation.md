@@ -166,6 +166,46 @@ Ziel war ein einfacher WYSIWYG-Editor für HTML-Seiten, der **ohne Installation*
   - `openPhotoDialog()` → Foto-Modus
 - Bedienungsanleitung vollständig aktualisiert (neue Abschnitte: Rückgängig, Modi, Drag & Drop)
 
+### Schritt 20 – „Speichern unter", Link-Reparatur, Einfügeposition-Anzeige (Juli 2026)
+
+Auslöser: Praxis-Feedback von Holger Uske (Juli 2026). Beim Anlegen einer neuen Pressemitteilung
+per Kopieren eines Übersichts-Eintrags zeigte der „Weiterlesen"-Link weiter auf die alte Detailseite,
+eine neue Detailseite ließ sich nicht anlegen, und ein Foto landete neben der Jahres-Überschrift
+statt im Beitrag. Vier Umbauten:
+
+- **💾 Speichern unter …** + echtes Speichern per **File System Access API** (`showSaveFilePicker`)
+  - Erster Klick auf „Speichern" öffnet das Windows-Speicherfenster (`suggestedName` = aktueller Dateiname, `id:'website-ordner'` merkt sich den zuletzt benutzten Ordner)
+  - Der zurückgegebene `fileHandle` wird gehalten → jedes weitere „Speichern" schreibt direkt in die Datei, ohne Dialog
+  - „Speichern unter …" schlägt `<name>-neu.html` vor und macht die neue Datei zur aktiven (`setCurrentFileName`) → Vorlagen-Workflow: alte Seite öffnen → sofort unter neuem Namen speichern → gefahrlos editieren
+  - Fallback für Browser ohne API (Firefox): bisheriger Blob-Download, bei „Speichern unter" mit `prompt()` für den Dateinamen
+- **Links direkt wählbar + sichere Link-Änderung**
+  - `A` in die `BLOCKS`-Liste von `nearestBlock()` aufgenommen → „Weiterlesen"-Buttons sind per Einfachklick selektierbar
+  - `confirmLink()`: enthält das gewählte Element genau **einen** Link, wird dessen `href` geändert statt das Element in einen (verschachtelten) Link einzuwickeln
+- **Einfügeposition-Anzeige im Foto-Dialog**
+  - Neue Infozeile („Einfügeposition: nach Überschrift „2026“") via `widInfo()` + `TAG_NAMES`-Übersetzung
+  - Gelbe Warnung, wenn das Ziel eine Überschrift (H1–H6) ist – exakt der Fehler aus dem Praxisfall
+- **Scrollposition bleibt erhalten**
+  - `refresh()` merkt sich `contentWindow.scrollY` und stellt sie im `load`-Handler des iframes wieder her (vorher sprang die Vorschau nach jeder Aktion an den Seitenanfang – auf langen Übersichtsseiten desorientierend)
+  - Nach Foto-Einfügen/-Ersetzen wird stattdessen das neue Bild per `scrollIntoView` zentriert (`pendingScrollBlob`)
+- Bedienungsanleitung: Abschnitt 12 (Speichern) neu geschrieben, neuer Abschnitt 13 „Neue Unterseite anlegen (z. B. neue Pressemitteilung)" mit Schritt-A/B-Workflow, zwei neue FAQ-Einträge
+
+### Schritt 21 – Direktes Ersetzen im Arbeitsordner (Juli 2026, Folgefix)
+
+Auslöser: Praxis-Feedback von Holger Uske zu Schritt 20. „Speichern" öffnete zwar den Windows-Dialog,
+schlug aber grundsätzlich den Downloads-Ordner vor und legte bei jedem Speichern eine neue, von Windows
+durchnummerierte Kopie an – das Original wurde nie ersetzt. Ursache: `openFolder()`/`openFile()` nutzten
+noch ausschließlich `<input webkitdirectory>` bzw. `<input type=file>`, die keine beschreibbaren
+`FileSystemFileHandle`s liefern; „Speichern" hatte dadurch nie einen Bezug zum Arbeitsordner.
+
+- **`openFolder()`** nutzt jetzt zuerst `showDirectoryPicker({mode:'readwrite'})` (Fallback: `<input webkitdirectory>`)
+  - `folderHandle` global gehalten; `walkFolder(dir, prefix)` liest den Ordner rekursiv in `folderFileMap`/`folderFileList` ein (bisher lieferte das `<input>`-Element das automatisch mit)
+- **`openFile()`** nutzt zuerst `showOpenFilePicker({startIn: folderHandle})` (Fallback: `<input type=file>`)
+  - liefert direkt ein `FileSystemFileHandle` → wird beim Laden als `fileHandle` übernommen (`loadHtmlFile(file, handle)`, gemeinsame Ladefunktion für beide Wege)
+- **`saveFile()`**: neue Priorität vor dem Picker-Fallback – `handleFromFolder()` prüft, ob die aktuell offene Datei nachweislich unterhalb von `folderHandle` liegt (Abgleich über `folderFileMap`), navigiert dorthin (`getDirectoryHandle`-Kette) und holt sich per `getFileHandle()` ein Schreib-Handle für **genau diese Datei** – dann wird direkt geschrieben, ganz ohne Dialog
+  - Nur wenn weder ein gehaltenes `fileHandle` noch ein Treffer im Arbeitsordner existiert, kommt der Picker (mit `startIn: folderHandle`, damit er dort startet statt in Downloads)
+  - Dateien außerhalb des Arbeitsordners lösen bewusst weiterhin den Dialog aus – kein stilles Schreiben an unerwarteten Ort
+- Bedienungsanleitung: Abschnitt 12 in „Fall A" (Datei über Arbeitspfad geöffnet → direktes Ersetzen ohne Dialog) und „Fall B" (Datei anders geöffnet → Windows-Dialog, dann gemerkt) aufgeteilt; Abschnitt 2/3 und FAQ ergänzt
+
 ---
 
 ## Begleitend entstandene Dokumente
@@ -173,7 +213,7 @@ Ziel war ein einfacher WYSIWYG-Editor für HTML-Seiten, der **ohne Installation*
 | Datei | Inhalt |
 |-------|--------|
 | `HTML-Editor.html` | Der fertige Editor (Standalone, ~1.100 Zeilen) |
-| `Bedienungsanleitung-HTML-Editor.html` | Schritt-für-Schritt-Anleitung für Einsteiger (14 Abschnitte) |
+| `Bedienungsanleitung-HTML-Editor.html` | Schritt-für-Schritt-Anleitung für Einsteiger (15 Abschnitte) |
 | `documentation.md` | Dieses Entwicklungsprotokoll |
 
 ---

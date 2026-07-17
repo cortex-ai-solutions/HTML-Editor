@@ -287,10 +287,15 @@ also der Ordner mit Ihren HTML-Dateien, Bildern und dem Design (CSS).</p>
 </div>
 
 <div class="tipp">
-  💡 <strong>Was passiert dabei?</strong> Der Editor lädt alle Dateien Ihres Website-Ordners in den Speicher.
+  💡 <strong>Was passiert dabei?</strong> Der Editor liest alle Dateien Ihres Website-Ordners ein.
   Das Design Ihrer Seite (CSS) wird automatisch eingebettet, sodass die Vorschau genauso aussieht wie
-  die echte Website. Ihre Bilder werden automatisch angezeigt. Die gespeicherte Datei bleibt unverändert –
-  es wird nichts an Ihren Originaldateien verändert.
+  die echte Website. Ihre Bilder werden automatisch angezeigt.
+</div>
+
+<div class="tipp">
+  💡 <strong>Direktes Speichern:</strong> Weil der Editor jetzt weiß, wo Ihr Website-Ordner liegt, kann er beim
+  Speichern <strong>direkt in diesem Ordner schreiben</strong> – ohne Downloads-Umweg. Details dazu in
+  Abschnitt 12 „Datei speichern".
 </div>
 
 <hr class="trennlinie">
@@ -324,6 +329,12 @@ also der Ordner mit Ihren HTML-Dateien, Bildern und dem Design (CSS).</p>
 <div class="hinweis">
   📌 <strong>Hinweis:</strong> Die Info-Leiste unterhalb der Werkzeugleiste zeigt Ihnen immer,
   welcher Ordner (Arbeitspfad) und welche Datei gerade geöffnet ist.
+</div>
+
+<div class="tipp">
+  💡 <strong>Warum das wichtig ist:</strong> Öffnen Sie die Datei über diesen Weg (statt z. B. per Doppelklick
+  im Explorer), merkt sich der Editor genau, wo sie liegt. Das sorgt dafür, dass „💾 Speichern" später die
+  richtige Datei direkt ersetzt, ohne Nachfrage – siehe Abschnitt 12.
 </div>
 
 <hr class="trennlinie">
@@ -751,6 +762,10 @@ Seite Ihrer Website oder zu einer externen Webseite.</p>
 <!-- ═══════════════════════════════════════ -->
 <h2>12. Datei speichern</h2>
 
+<p>Wie „💾 Speichern" sich verhält, hängt davon ab, <strong>wie Sie die Datei geöffnet haben:</strong></p>
+
+<h3>Fall A: Sie haben die Datei über „📁 Arbeitspfad festlegen" + „📂 Öffnen" geladen (Normalfall)</h3>
+
 <div class="schritt">
   <div class="schritt-zeile">
     <span class="nr">1</span>
@@ -761,14 +776,40 @@ Seite Ihrer Website oder zu einer externen Webseite.</p>
 <div class="schritt">
   <div class="schritt-zeile">
     <span class="nr">2</span>
-    <div class="schritt-text">Der Browser lädt die Datei automatisch herunter – sie landet im <strong>Downloads-Ordner</strong> Ihres Computers.</div>
+    <div class="schritt-text">Der Editor weiß, in welchem Ordner die Datei liegt (Sie haben ihn ja als Arbeitspfad festgelegt)
+    und <strong>ersetzt die Original-Datei direkt</strong> – ohne Nachfrage, ohne Fenster, ohne Downloads-Ordner.
+    Es entstehen <strong>keine</strong> zusätzlichen Kopien oder Versionsnummern.</div>
+  </div>
+</div>
+
+<div class="tipp">
+  💡 <strong>Das ist das empfohlene Vorgehen:</strong> Arbeitspfad festlegen → Datei darüber öffnen → bearbeiten →
+  Speichern. So landet jede Änderung garantiert in der richtigen Datei am richtigen Ort.
+</div>
+
+<h3>Fall B: Sie haben die Datei ohne vorherigen Arbeitspfad geöffnet (z. B. per Doppelklick oder aus einem anderen Ordner)</h3>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">1</span>
+    <div class="schritt-text">Klicken Sie auf <strong>💾 Speichern</strong>. Da der Editor den Speicherort nicht kennt,
+    öffnet sich das <strong>Windows-Speicherfenster</strong>.</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">2</span>
+    <div class="schritt-text">Wechseln Sie dort in den Ordner Ihrer Website, in dem die Original-Datei liegt, und klicken Sie auf
+    <strong>Speichern</strong>. Windows fragt: „Datei existiert bereits – ersetzen?" – antworten Sie mit <strong>Ja</strong>.</div>
   </div>
 </div>
 
 <div class="schritt">
   <div class="schritt-zeile">
     <span class="nr">3</span>
-    <div class="schritt-text">Kopieren Sie die gespeicherte Datei in den Ordner Ihrer Website (und ersetzen Sie dabei die alte Datei).</div>
+    <div class="schritt-text">Bei jedem <strong>weiteren Speichern</strong> dieser Datei merkt sich der Editor den gewählten Ort –
+    ein Klick auf „💾 Speichern" genügt dann, es öffnet sich kein Fenster mehr.</div>
   </div>
 </div>
 
@@ -776,7 +817,6 @@ Seite Ihrer Website oder zu einer externen Webseite.</p>
   💡 <strong>Originale Pfade bleiben erhalten:</strong> Die gespeicherte Datei enthält die gleichen
   Verweise auf CSS-Dateien und Bilder wie vorher – nur mit Ihren inhaltlichen Änderungen.
   Das eingebettete Design (CSS) der Vorschau wird <em>nicht</em> in die gespeicherte Datei geschrieben.
-  Alles funktioniert auf der echten Website genauso wie vorher – nur mit Ihren Änderungen.
 </div>
 
 <div class="hinweis">
@@ -786,10 +826,98 @@ Seite Ihrer Website oder zu einer externen Webseite.</p>
   alle Ihre Änderungen gehen dann verloren, aber die Originaldatei ist unverändert.
 </div>
 
+<div class="hinweis">
+  📌 <strong>Hinweis für ältere Browser (z. B. Firefox):</strong> Falls sich kein Speicherfenster öffnet,
+  lädt der Browser die Datei stattdessen in den <strong>Downloads-Ordner</strong> herunter – dort ggf. mit einer
+  Nummerierung wie „(1)" versehen, wenn dort schon eine Datei mit diesem Namen liegt.
+  Kopieren Sie sie dann von dort in den Ordner Ihrer Website und ersetzen Sie die alte Datei.
+</div>
+
 <hr class="trennlinie">
 
 <!-- ═══════════════════════════════════════ -->
-<h2>13. Schaltflächen-Übersicht</h2>
+<h2>13. Neue Unterseite anlegen (z. B. neue Pressemitteilung)</h2>
+
+<p>Der einfachste Weg zu einer neuen Unterseite: Sie nehmen eine <strong>bestehende, ähnliche Seite als Vorlage</strong>,
+speichern sie unter einem neuen Namen und ändern dann den Inhalt. So entsteht z. B. aus der letzten
+Pressemitteilung eine neue – mit dem gleichen Aussehen, aber neuem Text und neuen Fotos.</p>
+
+<h3>Schritt A: Neue Seite aus einer Vorlage erstellen</h3>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">1</span>
+    <div class="schritt-text">Öffnen Sie die <strong>bestehende Seite</strong>, die der neuen am ähnlichsten ist
+    (z. B. die letzte Pressemitteilung <em>pm_2026_03_literaturwerkstatt.html</em>).</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">2</span>
+    <div class="schritt-text">Klicken Sie <strong>sofort</strong> auf <strong>💾 Speichern unter …</strong> und geben Sie der Datei
+    einen <strong>neuen Namen</strong> (z. B. <em>pm_2026_07_scheunenlesung.html</em>).
+    <strong>Wichtig:</strong> Speichern Sie die neue Datei im <strong>selben Ordner</strong>, in dem auch die Vorlage liegt –
+    nur dann stimmen alle Verweise auf Bilder und Design.</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">3</span>
+    <div class="schritt-text">Ändern Sie jetzt in Ruhe die Inhalte: Überschrift und Texte per Doppelklick bearbeiten,
+    Fotos mit <strong>🔄 Foto ersetzen</strong> austauschen. Jedes „💾 Speichern" landet nun automatisch in der <strong>neuen</strong> Datei –
+    die Vorlage bleibt unverändert.</div>
+  </div>
+</div>
+
+<h3>Schritt B: Die neue Seite auf der Übersichtsseite verlinken</h3>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">4</span>
+    <div class="schritt-text">Öffnen Sie die <strong>Übersichtsseite</strong> (z. B. <em>pressemitteilungen.html</em>)
+    und wählen Sie den neuesten vorhandenen Eintrag aus (blauer Rahmen). Klicken Sie auf <strong>⧉ Duplizieren</strong> –
+    eine Kopie des Eintrags erscheint direkt darunter.</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">5</span>
+    <div class="schritt-text">Bearbeiten Sie in der Kopie Datum, Überschrift und Ankündigungstext per Doppelklick.
+    Mit <strong>↑ Hoch</strong> schieben Sie den neuen Eintrag an die oberste Stelle.</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">6</span>
+    <div class="schritt-text"><strong>Ganz wichtig:</strong> Klicken Sie im neuen Eintrag auf den
+    <strong>„Weiterlesen"-Knopf</strong> (er bekommt einen blauen Rahmen) und dann oben auf <strong>🔗 Hyperlink</strong>.
+    Wählen Sie über „📄 Seite aus Dateimanager wählen …" Ihre <strong>neue Seite</strong> aus Schritt A aus
+    und klicken Sie auf <strong>✔ Übernehmen</strong>. Sonst führt der Knopf noch zur alten Seite, von der Sie kopiert haben!</div>
+  </div>
+</div>
+
+<div class="schritt">
+  <div class="schritt-zeile">
+    <span class="nr">7</span>
+    <div class="schritt-text">Speichern Sie die Übersichtsseite mit <strong>💾 Speichern</strong>. Fertig!</div>
+  </div>
+</div>
+
+<div class="tipp">
+  💡 <strong>Merkhilfe:</strong> Eine neue Pressemitteilung besteht immer aus <strong>zwei Dingen</strong>:
+  der <strong>neuen Unterseite</strong> mit dem vollständigen Text (Schritt A) und dem <strong>Eintrag auf der
+  Übersichtsseite</strong>, dessen „Weiterlesen"-Knopf auf die neue Unterseite zeigt (Schritt B).
+  Wenn „Vollständiger Text" auf eine falsche Seite führt, ist fast immer der Link aus Schritt 6 noch nicht angepasst.
+</div>
+
+<hr class="trennlinie">
+
+<!-- ═══════════════════════════════════════ -->
+<h2>14. Schaltflächen-Übersicht</h2>
 
 <table>
   <tr>
@@ -798,7 +926,8 @@ Seite Ihrer Website oder zu einer externen Webseite.</p>
   </tr>
   <tr><td><strong>📁 Arbeitspfad festlegen</strong></td><td>Website-Ordner auswählen – lädt CSS und Bilder für die Vorschau</td></tr>
   <tr><td><strong>📂 Öffnen</strong></td><td>Eine HTML-Datei laden und anzeigen</td></tr>
-  <tr><td><strong>💾 Speichern</strong></td><td>Die bearbeitete Datei herunterladen (<span class="taste">Strg</span>+<span class="taste">S</span>)</td></tr>
+  <tr><td><strong>💾 Speichern</strong></td><td>Die bearbeitete Datei speichern – ersetzt die Original-Datei direkt, wenn diese über den Arbeitspfad geöffnet wurde; sonst über das Windows-Speicherfenster (<span class="taste">Strg</span>+<span class="taste">S</span>)</td></tr>
+  <tr><td><strong>💾 Speichern unter …</strong></td><td>Die geöffnete Seite unter neuem Namen speichern – ideal, um aus einer Vorlage eine neue Unterseite zu machen</td></tr>
   <tr><td><strong>↩ Rückgängig</strong></td><td>Letzte Änderung rückgängig machen (<span class="taste">Strg</span>+<span class="taste">Z</span>), bis zu 20 Schritte</td></tr>
   <tr><td><strong>📋 Kopieren</strong></td><td>Ausgewähltes Element kopieren (<span class="taste">Strg</span>+<span class="taste">C</span>)</td></tr>
   <tr><td><strong>⧉ Duplizieren</strong></td><td>Ausgewähltes Element direkt darunter duplizieren (<span class="taste">Strg</span>+<span class="taste">D</span>)</td></tr>
@@ -819,7 +948,7 @@ Seite Ihrer Website oder zu einer externen Webseite.</p>
 <hr class="trennlinie">
 
 <!-- ═══════════════════════════════════════ -->
-<h2>14. Häufige Fragen</h2>
+<h2>15. Häufige Fragen</h2>
 
 <h3>Die Bilder werden in der Vorschau nicht angezeigt.</h3>
 <p>Der Arbeitspfad wurde wahrscheinlich nicht festgelegt. Gehen Sie so vor:
@@ -867,10 +996,30 @@ erneut öffnen – alle Änderungen gehen dann verloren, aber die Originaldatei 
 was die korrekte Einstellung ist.</p>
 
 <h3>Meine Änderungen sind nach dem Speichern nicht auf der Website zu sehen.</h3>
-<p>Die gespeicherte Datei landet im <em>Downloads-Ordner</em> Ihres Computers. Sie müssen sie noch
-manuell in den Webseiten-Ordner auf dem Server kopieren und dabei die alte Datei ersetzen.
-Leeren Sie danach den Browser-Cache, falls die Seite noch das alte Aussehen zeigt
-(<span class="taste">Strg</span>+<span class="taste">Shift</span>+<span class="taste">R</span>).</p>
+<p>Prüfen Sie zuerst, ob Sie beim Speichern wirklich die Datei im <em>Webseiten-Ordner</em> ersetzt haben
+(und nicht versehentlich an einem anderen Ort gespeichert). Danach muss die geänderte Datei wie gewohnt
+auf den Server hochgeladen werden. Leeren Sie anschließend den Browser-Cache, falls die Seite noch
+das alte Aussehen zeigt (<span class="taste">Strg</span>+<span class="taste">Shift</span>+<span class="taste">R</span>).</p>
+
+<h3>„Speichern" legt eine zusätzliche Datei mit Versionsnummer an, statt das Original zu ersetzen.</h3>
+<p>Das passiert, wenn die Datei <strong>nicht</strong> über „📁 Arbeitspfad festlegen" + „📂 Öffnen" geladen wurde
+(z. B. per Doppelklick im Explorer geöffnet, oder Ihr Browser unterstützt das direkte Speichern nicht).
+In diesem Fall speichert der Editor über den Downloads-Ordner, und Windows hängt bei bereits vorhandenem
+Dateinamen automatisch eine Nummer an. Abhilfe: Legen Sie <strong>zuerst</strong> den Arbeitspfad fest und öffnen
+Sie die Datei darüber (Abschnitt 2 und 3) – dann ersetzt „Speichern" die Original-Datei direkt, ohne Umweg
+über Downloads. Räumen Sie überzählige Kopien im Downloads-Ordner danach von Hand auf.</p>
+
+<h3>Der „Weiterlesen"-Knopf meines neuen Eintrags führt zur falschen Seite.</h3>
+<p>Das passiert, wenn ein Eintrag von einem älteren kopiert wurde – der Knopf zeigt dann noch auf die alte Seite.
+Klicken Sie auf den „Weiterlesen"-Knopf (blauer Rahmen), dann auf <strong>🔗 Hyperlink</strong>, und wählen Sie
+die richtige Zielseite aus. Die Schritt-für-Schritt-Anleitung steht in
+<strong>Abschnitt 13 – Neue Unterseite anlegen</strong>.</p>
+
+<h3>Mein Foto ist an der falschen Stelle gelandet (z. B. neben einer Überschrift).</h3>
+<p>Das Foto wird immer <em>nach dem blau umrahmten Element</em> eingefügt. Wenn eine Überschrift ausgewählt war,
+landet das Foto direkt unter der Überschrift. Das Dialogfenster zeigt die Einfügeposition vor dem Einfügen an –
+bei einer Überschrift erscheint zusätzlich eine gelbe Warnung. Zum Korrigieren: <strong>↩ Rückgängig</strong> klicken,
+dann den <em>Textabsatz des Beitrags</em> anklicken (nicht die Überschrift) und das Foto erneut einfügen.</p>
 
 <div class="seitenende">
   Bedienungsanleitung für den HTML Editor &nbsp;&middot;&nbsp;

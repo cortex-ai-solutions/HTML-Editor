@@ -175,6 +175,7 @@
   <button onclick="openFolder()" id="btn-folder" title="Den Ordner Ihrer Website festlegen &#8211; damit Bilder und CSS-Stile geladen werden k&#246;nnen">&#128193; Arbeitspfad festlegen</button>
   <button onclick="openFile()">&#128194; &#214;ffnen</button>
   <button onclick="saveFile()" id="btn-save">&#128190; Speichern</button>
+  <button onclick="saveFileAs()" id="btn-save-as" title="Ge&#246;ffnete Seite unter neuem Namen speichern &#8211; z. B. um aus einer alten Seite eine neue zu machen">&#128190; Speichern unter &hellip;</button>
   <button onclick="undo()" id="btn-undo" disabled title="Strg+Z">&#8617; R&#252;ckg&#228;ngig</button>
   <button onclick="loadDemo()">&#8635; Beispiel</button>
   <div class="sep"></div>
@@ -254,6 +255,13 @@
 <div id="photo-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
   <div style="background:#1e293b; border:1px solid #38bdf8; border-radius:10px; padding:28px 32px; min-width:460px; max-width:560px; width:92%; box-shadow:0 8px 40px rgba(0,0,0,0.6); max-height:90vh; overflow-y:auto;">
     <h3 style="color:#38bdf8; margin-bottom:20px; font-size:15px;">&#128444; Foto einf&#252;gen</h3>
+
+    <div id="dlg-pos-info" style="background:#0c2340; border:1px solid #1d4ed8; border-radius:5px; padding:8px 12px; font-size:12px; color:#7dd3fc; margin-bottom:10px;"></div>
+    <div id="dlg-pos-warn" style="display:none; background:#2d2308; border:1px solid #fbbf24; border-radius:5px; padding:8px 12px; font-size:12px; color:#fde68a; margin-bottom:10px;">
+      &#9888; <strong>Achtung:</strong> Das Foto landet direkt unter dieser <strong>&#220;berschrift</strong> &ndash;
+      nicht in einem Beitrag. Soll das Foto in einen Beitrag, klicken Sie auf <em>Abbrechen</em> und
+      w&#228;hlen Sie zuerst den gew&#252;nschten Textabsatz des Beitrags aus.
+    </div>
 
     <label class="dlg-label"><strong style="color:#fbbf24;">Foto ausw&#228;hlen</strong></label>
     <button onclick="document.getElementById('dlg-filepicker').click()"
@@ -345,6 +353,7 @@ let folderFileMap = {}, cssCache = {}, previewBlobUrls = [];
 let folderFileList = [], htmlDirInFolder = '', currentImgRelPath = '', currentFolderName = '';
 let linkType = 'internal', pickedLinkPath = '';
 let undoStack = [], insertAfterWid = undefined, pendingPhotoMode = null, editorMode = 'text';
+let fileHandle = null, folderHandle = null, lastScrollY = 0, pendingScrollBlob = null;
 
 const DEMO_HTML = `<!DOCTYPE html>
 <html lang="de">
@@ -429,7 +438,7 @@ async function buildIframe(html) {
     const script = doc.createElement('script');
     script.textContent = `(function(){
       var cur=null,editing=null,editorMode='${editorMode}';
-      var BLOCKS={DIV:1,P:1,H1:1,H2:1,H3:1,H4:1,H5:1,H6:1,UL:1,OL:1,LI:1,TABLE:1,TBODY:1,TR:1,TD:1,TH:1,SECTION:1,ARTICLE:1,HEADER:1,FOOTER:1,NAV:1,ASIDE:1,FIGURE:1,BLOCKQUOTE:1,PRE:1,FORM:1,IMG:1};
+      var BLOCKS={DIV:1,P:1,H1:1,H2:1,H3:1,H4:1,H5:1,H6:1,UL:1,OL:1,LI:1,TABLE:1,TBODY:1,TR:1,TD:1,TH:1,SECTION:1,ARTICLE:1,HEADER:1,FOOTER:1,NAV:1,ASIDE:1,FIGURE:1,BLOCKQUOTE:1,PRE:1,FORM:1,IMG:1,A:1};
       function nearestBlock(el){
         while(el&&el!==document.body){
           if(el.hasAttribute('data-wid')&&BLOCKS[el.tagName])return el;
@@ -693,9 +702,12 @@ function confirmLink(){
   const newTab=document.getElementById('link-new-tab').checked;
   doManipulate((doc,el)=>{
     if(!el)return;
-    if(el.tagName==='A'){
-      el.setAttribute('href',href);
-      if(newTab)el.setAttribute('target','_blank');else el.removeAttribute('target');
+    // Enthält das gewählte Element genau einen Link, wird dessen Ziel geändert
+    // (z. B. „Weiterlesen"-Knopf in einer Kachel) statt alles neu einzubetten.
+    const target=el.tagName==='A'?el:(el.querySelectorAll('a').length===1?el.querySelector('a'):null);
+    if(target){
+      target.setAttribute('href',href);
+      if(newTab)target.setAttribute('target','_blank');else target.removeAttribute('target');
     } else {
       const a=doc.createElement('a');
       a.setAttribute('href',href);
@@ -749,6 +761,34 @@ function extractSelectedDimensions(){
   return null;
 }
 
+// ── Einfügeposition beschreiben ───────────────────
+const TAG_NAMES={H1:'Überschrift',H2:'Überschrift',H3:'Überschrift',H4:'Überschrift',H5:'Überschrift',H6:'Überschrift',P:'Absatz',DIV:'Bereich',IMG:'Bild',UL:'Liste',OL:'Liste',LI:'Listenpunkt',TABLE:'Tabelle',A:'Link',SPAN:'Text',SECTION:'Abschnitt',ARTICLE:'Beitrag',FIGURE:'Bild-Bereich',BLOCKQUOTE:'Zitat'};
+function widInfo(wid){
+  if(!wid)return null;
+  const doc=new DOMParser().parseFromString(currentHtml,'text/html');
+  let c=0,found=null;
+  doc.body.querySelectorAll('*').forEach(el=>{if(String(++c)===String(wid))found=el;});
+  if(!found)return null;
+  const text=(found.tagName==='IMG'?(found.getAttribute('alt')||''):(found.textContent||'')).trim().replace(/\s+/g,' ');
+  return {tag:found.tagName,text:text.slice(0,60)+(text.length>60?'…':'')};
+}
+function updatePhotoPosInfo(){
+  const info=document.getElementById('dlg-pos-info');
+  const warn=document.getElementById('dlg-pos-warn');
+  warn.style.display='none';
+  if(imgInsertMode==='replace'){info.innerHTML='&#128257; Das ausgewählte Bild wird ersetzt.';return;}
+  if(imgInsertMode==='end'){info.innerHTML='&#128204; Einfügeposition: <strong>ganz am Ende der Seite</strong>';return;}
+  const wid=insertAfterWid!==undefined?insertAfterWid:selectedWid;
+  const w=widInfo(wid);
+  if(!w){
+    info.innerHTML='&#128204; Einfügeposition: <strong>'+(imgInsertMode==='before'?'am Anfang':'am Ende')+' der Seite</strong>';
+    return;
+  }
+  const name=TAG_NAMES[w.tag]||'Element';
+  info.innerHTML='&#128204; Einfügeposition: <strong>'+(imgInsertMode==='before'?'vor':'nach')+' '+name+'</strong>'+(w.text?' „'+w.text+'“':'');
+  if(/^H[1-6]$/.test(w.tag))warn.style.display='block';
+}
+
 function openPhotoDialog(mode){
   setMode('photo');
   if(document.getElementById('btn-edit').classList.contains('edit-active')){
@@ -775,6 +815,7 @@ function openPhotoDialog(mode){
     document.getElementById('dlg-dim-row').style.display='none';
   }
   refreshPhotoDialog();
+  updatePhotoPosInfo();
   document.getElementById('photo-overlay').style.display='flex';
 }
 
@@ -831,6 +872,7 @@ function confirmPhoto(){
   }
   blobMap[currentBlobUrl]=finalPath;
   const imgTag='<img src="'+currentBlobUrl+'" alt="'+alt+'" style="'+widthStyle+' display:block; margin:12px 0;" onerror="this.style.display=\'none\'">';
+  pendingScrollBlob=currentBlobUrl; // nach dem Neuaufbau zum neuen Foto scrollen
   currentBlobUrl=null; // URL ist jetzt in blobMap/imgTag – NICHT widerrufen, sonst wird das Foto unsichtbar
   closePhotoDialog();
   if(imgInsertMode==='replace') doManipulate((doc,el)=>{
@@ -855,10 +897,56 @@ document.getElementById('photo-overlay').addEventListener('click',e=>{if(e.targe
 document.getElementById('photo-overlay').addEventListener('keydown',e=>{if(e.key==='Escape')closePhotoDialog();});
 
 // ── Datei öffnen / speichern ──────────────────────
-function openFile(){document.getElementById('file-input').click();}
-function openFolder(){document.getElementById('folder-input').click();}
+async function openFile(){
+  if(window.showOpenFilePicker){
+    try{
+      const opts={id:'website-ordner',types:[{description:'HTML-Datei',accept:{'text/html':['.html','.htm']}}]};
+      if(folderHandle)opts.startIn=folderHandle;
+      const handles=await window.showOpenFilePicker(opts);
+      const handle=handles[0];
+      loadHtmlFile(await handle.getFile(),handle);
+      return;
+    }catch(e){
+      if(e&&e.name==='AbortError')return;
+    }
+  }
+  document.getElementById('file-input').click();
+}
+
+async function openFolder(){
+  if(window.showDirectoryPicker){
+    try{
+      const dir=await window.showDirectoryPicker({id:'website-ordner',mode:'readwrite'});
+      folderHandle=dir;
+      folderFileMap={};cssCache={};folderFileList=[];
+      currentFolderName=dir.name;
+      await walkFolder(dir,'');
+      finishFolderLoad();
+      return;
+    }catch(e){
+      if(e&&e.name==='AbortError')return;
+    }
+  }
+  document.getElementById('folder-input').click();
+}
+
+async function walkFolder(dir,prefix){
+  for await(const entry of dir.values()){
+    if(entry.name.startsWith('.'))continue;
+    if(entry.kind==='file'){
+      const file=await entry.getFile();
+      const rel=prefix+entry.name;
+      folderFileMap[rel]=file;
+      folderFileMap[entry.name]=file;
+      folderFileList.push({relPath:rel,file});
+    }else if(entry.kind==='directory'){
+      await walkFolder(entry,prefix+entry.name+'/');
+    }
+  }
+}
 
 function onFolderChosen(e){
+  folderHandle=null;
   folderFileMap={};cssCache={};folderFileList=[];
   const files=Array.from(e.target.files);
   currentFolderName=files.length?files[0].webkitRelativePath.split('/')[0]:'';
@@ -868,12 +956,16 @@ function onFolderChosen(e){
     folderFileMap[file.name]=file;
     folderFileList.push({relPath:rel,file});
   });
+  e.target.value='';
+  finishFolderLoad();
+}
+
+function finishFolderLoad(){
   if(currentFile){
     const entry=folderFileList.find(({relPath})=>relPath===currentFile||relPath.endsWith('/'+currentFile));
     htmlDirInFolder=(entry&&entry.relPath.includes('/'))
       ?entry.relPath.substring(0,entry.relPath.lastIndexOf('/')):'';
   }
-  e.target.value='';
   document.getElementById('ib-folder').textContent=currentFolderName||'\u2014';
   document.getElementById('ib-folder').className='ib-folder';
   flash('Arbeitspfad festgelegt \u2013 '+folderFileList.length+' Dateien verf\u00FCgbar');
@@ -883,9 +975,15 @@ function onFolderChosen(e){
 
 function onFileChosen(e){
   const file=e.target.files[0]; if(!file)return;
+  loadHtmlFile(file,null);
+  e.target.value='';
+}
+
+function loadHtmlFile(file,handle){
   const reader=new FileReader();
   reader.onload=ev=>{
     undoStack=[];document.getElementById('btn-undo').disabled=true;
+    fileHandle=handle||null;lastScrollY=0;pendingScrollBlob=null;
     currentHtml=ev.target.result; currentFile=file.name; blobMap={};
     document.getElementById('preview-filename').textContent=file.name;
     document.getElementById('ib-file').textContent=file.name;
@@ -899,24 +997,115 @@ function onFileChosen(e){
     flash(file.name+' geladen');
   };
   reader.readAsText(file,'UTF-8');
-  e.target.value='';
 }
 
-function saveFile(){
-  if(!currentHtml)return;
+function exportHtml(){
   // BUG-FIX 2: Blob-URLs durch relative Pfade ersetzen vor dem Speichern
   let html=currentHtml;
   for(const[blobUrl,relPath]of Object.entries(blobMap)) html=html.split(blobUrl).join(relPath);
+  return html;
+}
+function downloadHtml(html,name){
   const blob=new Blob([html],{type:'text/html;charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=url; a.download=currentFile||'seite.html';
+  a.href=url; a.download=name;
   document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
-  flash('Gespeichert: '+(currentFile||'seite.html'));
+}
+function setCurrentFileName(name){
+  currentFile=name;
+  document.getElementById('preview-filename').textContent=name;
+  document.getElementById('ib-file').textContent=name;
+  document.getElementById('ib-file').className='ib-file';
+}
+const SAVE_PICKER_OPTS={id:'website-ordner',types:[{description:'HTML-Datei',accept:{'text/html':['.html','.htm']}}]};
+async function writeToHandle(handle,html){
+  const w=await handle.createWritable();
+  await w.write(html); await w.close();
+}
+// Datei-Handle der geöffneten Datei aus dem Arbeitsordner ableiten –
+// nur wenn die Datei nachweislich aus dem Arbeitsordner stammt.
+async function handleFromFolder(){
+  if(!folderHandle||!currentFile)return null;
+  const rel=(htmlDirInFolder?htmlDirInFolder+'/':'')+currentFile;
+  if(!folderFileMap[rel])return null;
+  try{
+    let dir=folderHandle;
+    for(const p of (htmlDirInFolder?htmlDirInFolder.split('/'):[]))dir=await dir.getDirectoryHandle(p);
+    return await dir.getFileHandle(currentFile);
+  }catch(e){return null;}
+}
+async function saveFile(){
+  if(!currentHtml)return;
+  const html=exportHtml();
+  if(fileHandle){
+    try{
+      await writeToHandle(fileHandle,html);
+      flash('Gespeichert: '+currentFile);
+      return;
+    }catch(e){
+      if(e&&e.name==='AbortError')return;
+      fileHandle=null;
+    }
+  }
+  const fh=await handleFromFolder();
+  if(fh){
+    try{
+      await writeToHandle(fh,html);
+      fileHandle=fh;
+      flash('Gespeichert: '+currentFile);
+      return;
+    }catch(e){
+      if(e&&e.name==='AbortError')return;
+    }
+  }
+  if(window.showSaveFilePicker){
+    try{
+      const opts=Object.assign({suggestedName:currentFile||'seite.html'},SAVE_PICKER_OPTS);
+      if(folderHandle)opts.startIn=folderHandle;
+      const handle=await window.showSaveFilePicker(opts);
+      await writeToHandle(handle,html);
+      fileHandle=handle;
+      setCurrentFileName(handle.name);
+      flash('Gespeichert: '+handle.name);
+      return;
+    }catch(e){
+      if(e&&e.name==='AbortError')return;
+    }
+  }
+  downloadHtml(html,currentFile||'seite.html');
+  flash('Gespeichert im Downloads-Ordner: '+(currentFile||'seite.html'));
+}
+async function saveFileAs(){
+  if(!currentHtml)return;
+  const html=exportHtml();
+  const suggested=(currentFile||'seite.html').replace(/\.html?$/i,'')+'-neu.html';
+  if(window.showSaveFilePicker){
+    try{
+      const opts=Object.assign({suggestedName:suggested},SAVE_PICKER_OPTS);
+      if(folderHandle)opts.startIn=folderHandle;
+      const handle=await window.showSaveFilePicker(opts);
+      await writeToHandle(handle,html);
+      fileHandle=handle;
+      setCurrentFileName(handle.name);
+      flash('Neue Datei gespeichert: '+handle.name+' – im selben Ordner wie das Original speichern, damit Links und Bilder stimmen',6000);
+      return;
+    }catch(e){
+      if(e&&e.name==='AbortError')return;
+    }
+  }
+  let name=prompt('Dateiname für die neue Datei:',suggested);
+  if(!name)return;
+  if(!/\.html?$/i.test(name))name+='.html';
+  downloadHtml(html,name);
+  fileHandle=null;
+  setCurrentFileName(name);
+  flash('Neue Datei im Downloads-Ordner gespeichert: '+name,6000);
 }
 
 function loadDemo(){
   undoStack=[];document.getElementById('btn-undo').disabled=true;
+  fileHandle=null;lastScrollY=0;pendingScrollBlob=null;
   currentHtml=DEMO_HTML; currentFile='demo.html'; blobMap={};
   document.getElementById('preview-filename').textContent='demo.html (Beispiel)';
   clearSelection();showEditor();refresh();
@@ -939,7 +1128,9 @@ function showEditor(){
   setView(currentView==='split'?'split':currentView);
 }
 async function refresh(){
-  document.getElementById('preview-frame').srcdoc=await buildIframe(currentHtml);
+  const frame=document.getElementById('preview-frame');
+  try{lastScrollY=frame.contentWindow.scrollY||lastScrollY;}catch(e){}
+  frame.srcdoc=await buildIframe(currentHtml);
   document.getElementById('code-editor').value=currentHtml;
   updateUI();
   if(Object.keys(folderFileMap).length===0&&currentHtml){
@@ -996,11 +1187,11 @@ function undo(){
   flash('Rückgängig gemacht');
 }
 
-function flash(msg){
+function flash(msg,ms){
   const el=document.getElementById('status-flash');
   el.textContent=msg;el.classList.remove('hidden');
   if(flashTimer)clearTimeout(flashTimer);
-  flashTimer=setTimeout(()=>el.classList.add('hidden'),2500);
+  flashTimer=setTimeout(()=>el.classList.add('hidden'),ms||2500);
 }
 
 // ── Nachrichten vom iframe ────────────────────────
@@ -1029,6 +1220,34 @@ window.addEventListener('message',function(e){
       flash('Text gespeichert');
     }
   }
+});
+
+// ── Scrollposition über Neuaufbau hinweg erhalten ─
+// Erst wiederherstellen, wenn alle Bilder geladen/fehlgeschlagen sind – sonst
+// verschiebt das nachträgliche Ein-/Ausblenden der Bilder die Position wieder.
+document.getElementById('preview-frame').addEventListener('load',function(){
+  const w=this.contentWindow;
+  if(!w)return;
+  let done=false;
+  const restore=()=>{
+    if(done)return;done=true;
+    try{
+      if(pendingScrollBlob){
+        const img=w.document.querySelector('img[src="'+pendingScrollBlob+'"]');
+        pendingScrollBlob=null;
+        if(img){img.scrollIntoView({block:'center'});return;}
+      }
+      if(lastScrollY)w.scrollTo(0,lastScrollY);
+    }catch(e){}
+  };
+  try{
+    const pending=Array.from(w.document.images).filter(i=>!i.complete);
+    if(!pending.length){restore();return;}
+    let n=pending.length;
+    const one=()=>{if(--n<=0)setTimeout(restore,30);};
+    pending.forEach(i=>{i.addEventListener('load',one);i.addEventListener('error',one);});
+    setTimeout(restore,1000);
+  }catch(e){restore();}
 });
 
 // ── Tastaturkürzel ────────────────────────────────
