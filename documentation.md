@@ -224,6 +224,31 @@ keinerlei Ortsangabe.
 - Getestet durch gestubbtes `showOpenFilePicker`/`showSaveFilePicker`: Datei ausschließlich über „Öffnen"
   geladen (kein Arbeitspfad) → `saveFileAs()`-Aufruf übergibt exakt das `fileHandle` der offenen Datei als `startIn`.
 
+### Schritt 23 – Warnbanner bei fehlender Datei-System-API (Juli 2026)
+
+Auslöser: Screenshot-Feedback von Tobias Uske – der beim Test in Firefox gezeigte „Speichern unter"-Dialog
+war gar kein Windows-Dialog, sondern das schlichte `prompt()`-Fallback der Webseite (erkennbar am
+`file://`-Titel statt eines echten Explorer-Fensters). Firefox implementiert die File System Access API
+grundsätzlich nicht – das ist keine Version- oder Konfigurationsfrage, sondern eine bewusste
+Produktentscheidung von Mozilla. Für diesen Fall lässt sich im Code nichts „reparieren": ohne die API
+kann eine Webseite in Firefox weder einen Ordner erfragen noch eine bestehende Datei direkt überschreiben;
+einzig der Download-Mechanismus des Browsers steht zur Verfügung, dessen Zielordner die Seite nicht
+beeinflussen kann.
+
+- Neuer `#browser-warning`-Banner direkt unter der Info-Leiste: Prüft beim Laden `!window.showSaveFilePicker
+  || !window.showOpenFilePicker || !window.showDirectoryPicker` und zeigt bei fehlender Unterstützung eine
+  dauerhafte (per „✕" schließbare) Warnung mit konkreter Empfehlung (Edge/Chrome)
+  - **Bug beim ersten Entwurf:** Inline-Style enthielt versehentlich sowohl `display:none` als auch
+    `display:flex` im selben Attribut – die spätere Deklaration gewinnt in CSS, wodurch der Banner
+    entgegen der Absicht immer sichtbar war. Automatisierter Test (Edge mit vorhandener API → Banner
+    muss unsichtbar bleiben) deckte das sofort auf; behoben durch Entfernen des überflüssigen `display:none`
+    aus dem `flex`-Block.
+- Bedienungsanleitung: Abschnitt 1 empfiehlt jetzt explizit Edge/Chrome statt Firefox als dritte
+  gleichwertige Option; Abschnitt 12 und die Versionsnummer-FAQ unterscheiden zwischen „Firefox (keine
+  Abhilfe außer Browserwechsel)" und „Datei ohne Arbeitspfad geöffnet (Abhilfe: Abschnitt 2+3 befolgen)"
+- README: Abschnitt „Browser support" klargestellt – Firefox/Safari fehlt die API grundsätzlich, kein
+  Kompatibilitätsproblem, das sich per Update löst
+
 ---
 
 ## Begleitend entstandene Dokumente

@@ -75,8 +75,14 @@ Load a local HTML file, edit it visually, and save it back — without touching 
 
 ## Browser support
 
-Chrome, Edge, Firefox — any modern browser with File API and `webkitdirectory` support.
-Safari has limited `webkitdirectory` support; folder loading may not work correctly.
+**Chrome or Edge recommended.** Both implement the File System Access API, which lets the editor
+write changes directly back to the opened file/folder — no dialog after the first save.
+
+Firefox and Safari don't implement this API at all (not a version issue — it's simply unsupported
+there), so the editor falls back to triggering a browser download for every save; the folder is
+whatever the browser's download settings dictate, not something the page can influence, and repeat
+saves get auto-numbered by Windows. The editor shows an in-app warning banner when this API is
+missing so this isn't a silent surprise.
 
 ---
 

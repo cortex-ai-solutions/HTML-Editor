@@ -205,6 +205,14 @@
   <span class="ib-label">Datei:</span><span id="ib-file" class="ib-none">keine Datei ge&#246;ffnet</span>
 </div>
 
+<div id="browser-warning" style="display:none; background:#2d2308; border-bottom:1px solid #fbbf24; color:#fde68a; padding:8px 14px; font-size:12px; align-items:center; gap:10px;">
+  <span>&#9888;&#65039; <strong>Dieser Browser unterst&#252;tzt kein direktes Speichern.</strong>
+  &#8222;Speichern&#8220; und &#8222;Speichern unter &hellip;&#8220; laden die Datei stattdessen in Ihren <strong>Downloads-Ordner</strong> herunter
+  (mit fortlaufender Nummerierung) &#8211; Sie m&#252;ssen sie von dort manuell in Ihren Website-Ordner verschieben und die alte Datei ersetzen.
+  F&#252;r direktes Speichern am richtigen Ort verwenden Sie bitte <strong>Microsoft Edge</strong> oder <strong>Google Chrome</strong>.</span>
+  <button onclick="document.getElementById('browser-warning').style.display='none'" style="margin-left:auto; flex-shrink:0; padding:3px 10px; font-size:12px;">&#10005;</button>
+</div>
+
 <!-- Hyperlink-Dialog -->
 <div id="link-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
   <div style="background:#1e293b; border:1px solid #38bdf8; border-radius:10px; padding:28px 32px; min-width:440px; max-width:520px; width:92%; box-shadow:0 8px 40px rgba(0,0,0,0.6);">
@@ -1226,6 +1234,13 @@ window.addEventListener('message',function(e){
     }
   }
 });
+
+// ── Hinweis bei fehlender Datei-System-API (z. B. Firefox) ──
+// Ohne showSaveFilePicker/showOpenFilePicker/showDirectoryPicker kann der Editor
+// den Speicherort nicht kennen; "Speichern" landet dann immer im Downloads-Ordner.
+if(!window.showSaveFilePicker||!window.showOpenFilePicker||!window.showDirectoryPicker){
+  document.getElementById('browser-warning').style.display='flex';
+}
 
 // ── Scrollposition über Neuaufbau hinweg erhalten ─
 // Erst wiederherstellen, wenn alle Bilder geladen/fehlgeschlagen sind – sonst

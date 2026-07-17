@@ -236,7 +236,7 @@ Sie müssen nichts installieren. So starten Sie das Programm:</p>
 <div class="schritt">
   <div class="schritt-zeile">
     <span class="nr">2</span>
-    <div class="schritt-text">Machen Sie einen <strong>Doppelklick</strong> auf die Datei. Sie öffnet sich automatisch im Browser (Firefox, Chrome oder Edge).</div>
+    <div class="schritt-text">Machen Sie einen <strong>Doppelklick</strong> auf die Datei. Sie öffnet sich automatisch in Ihrem Browser.</div>
   </div>
 </div>
 
@@ -247,9 +247,13 @@ Sie müssen nichts installieren. So starten Sie das Programm:</p>
   </div>
 </div>
 
-<div class="tipp">
-  💡 <strong>Tipp:</strong> Klicken Sie mit der rechten Maustaste auf die Datei und wählen Sie
-  „Öffnen mit" &rarr; „Firefox" oder „Chrome", falls sie sich nicht automatisch öffnet.
+<div class="warnung">
+  ⚠️ <strong>Bitte Microsoft Edge oder Google Chrome verwenden.</strong> Nur diese Browser können beim
+  Speichern die Original-Datei direkt an Ort und Stelle ersetzen. In <strong>Firefox</strong> fehlt diese
+  Browser-Funktion – dort landet jede gespeicherte Datei stattdessen im Downloads-Ordner und muss von Hand
+  in den Website-Ordner verschoben werden (Details in Abschnitt 12). Der Editor öffnet sich normalerweise
+  automatisch im richtigen Browser; falls nicht, klicken Sie mit der rechten Maustaste auf die Datei und
+  wählen Sie „Öffnen mit" &rarr; „Microsoft Edge".
 </div>
 
 <hr class="trennlinie">
@@ -827,10 +831,13 @@ Seite Ihrer Website oder zu einer externen Webseite.</p>
 </div>
 
 <div class="hinweis">
-  📌 <strong>Hinweis für ältere Browser (z. B. Firefox):</strong> Falls sich kein Speicherfenster öffnet,
-  lädt der Browser die Datei stattdessen in den <strong>Downloads-Ordner</strong> herunter – dort ggf. mit einer
-  Nummerierung wie „(1)" versehen, wenn dort schon eine Datei mit diesem Namen liegt.
-  Kopieren Sie sie dann von dort in den Ordner Ihrer Website und ersetzen Sie die alte Datei.
+  📌 <strong>Hinweis für Firefox:</strong> Firefox unterstützt das direkte Speichern nicht – der Editor zeigt
+  dann oben eine orangefarbene Warnung an. „Speichern" öffnet dort kein Windows-Fenster, sondern lädt die
+  Datei automatisch in den <strong>Downloads-Ordner</strong> herunter – mit fortlaufender Nummerierung wie
+  „(1)", „(2)" &hellip;, wenn dort schon eine Datei mit diesem Namen liegt. Sie müssten sie dann jedes Mal
+  von Hand in den Ordner Ihrer Website verschieben und die alte Datei ersetzen. Verwenden Sie deshalb
+  wie in Abschnitt 1 empfohlen <strong>Microsoft Edge</strong> oder <strong>Google Chrome</strong> – dort
+  entfällt dieser Umweg komplett.
 </div>
 
 <hr class="trennlinie">
@@ -1001,13 +1008,18 @@ was die korrekte Einstellung ist.</p>
 auf den Server hochgeladen werden. Leeren Sie anschließend den Browser-Cache, falls die Seite noch
 das alte Aussehen zeigt (<span class="taste">Strg</span>+<span class="taste">Shift</span>+<span class="taste">R</span>).</p>
 
-<h3>„Speichern" legt eine zusätzliche Datei mit Versionsnummer an, statt das Original zu ersetzen.</h3>
-<p>Das passiert, wenn die Datei <strong>nicht</strong> über „📁 Arbeitspfad festlegen" + „📂 Öffnen" geladen wurde
-(z. B. per Doppelklick im Explorer geöffnet, oder Ihr Browser unterstützt das direkte Speichern nicht).
-In diesem Fall speichert der Editor über den Downloads-Ordner, und Windows hängt bei bereits vorhandenem
-Dateinamen automatisch eine Nummer an. Abhilfe: Legen Sie <strong>zuerst</strong> den Arbeitspfad fest und öffnen
-Sie die Datei darüber (Abschnitt 2 und 3) – dann ersetzt „Speichern" die Original-Datei direkt, ohne Umweg
-über Downloads. Räumen Sie überzählige Kopien im Downloads-Ordner danach von Hand auf.</p>
+<h3>„Speichern" bzw. „Speichern unter" legt eine zusätzliche Datei mit Versionsnummer an, statt das Original zu ersetzen.</h3>
+<p>Zwei mögliche Ursachen:</p>
+<p><strong>1. Oben erscheint eine orangefarbene Warnung „Dieser Browser unterstützt kein direktes Speichern".</strong>
+Dann nutzen Sie Firefox oder einen anderen Browser ohne diese Funktion – dort gibt es <em>keine</em> Möglichkeit,
+den Speicherort selbst zu wählen; jede gespeicherte Datei landet automatisch im Downloads-Ordner, mit
+Nummerierung bei Namensgleichheit. Einzige Abhilfe: Wechseln Sie zu <strong>Microsoft Edge</strong> oder
+<strong>Google Chrome</strong> (Abschnitt 1).</p>
+<p><strong>2. Keine Warnung sichtbar, aber trotzdem eine Kopie im Downloads-Ordner:</strong> Dann wurde die
+Datei vermutlich <strong>nicht</strong> über „📁 Arbeitspfad festlegen" + „📂 Öffnen" geladen (z. B. per
+Doppelklick im Explorer geöffnet). Legen Sie <strong>zuerst</strong> den Arbeitspfad fest und öffnen Sie die
+Datei darüber (Abschnitt 2 und 3) – dann ersetzt „Speichern" die Original-Datei direkt.</p>
+<p>Räumen Sie überzählige Kopien im Downloads-Ordner in beiden Fällen von Hand auf.</p>
 
 <h3>Der „Weiterlesen"-Knopf meines neuen Eintrags führt zur falschen Seite.</h3>
 <p>Das passiert, wenn ein Eintrag von einem älteren kopiert wurde – der Knopf zeigt dann noch auf die alte Seite.
