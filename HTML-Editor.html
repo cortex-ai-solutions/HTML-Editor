@@ -901,7 +901,8 @@ async function openFile(){
   if(window.showOpenFilePicker){
     try{
       const opts={id:'website-ordner',types:[{description:'HTML-Datei',accept:{'text/html':['.html','.htm']}}]};
-      if(folderHandle)opts.startIn=folderHandle;
+      const startHandle=folderHandle||fileHandle;
+      if(startHandle)opts.startIn=startHandle;
       const handles=await window.showOpenFilePicker(opts);
       const handle=handles[0];
       loadHtmlFile(await handle.getFile(),handle);
@@ -1083,7 +1084,11 @@ async function saveFileAs(){
   if(window.showSaveFilePicker){
     try{
       const opts=Object.assign({suggestedName:suggested},SAVE_PICKER_OPTS);
-      if(folderHandle)opts.startIn=folderHandle;
+      // Dialog dort starten, wo die aktuell offene Datei liegt (genauer als der
+      // allgemeine Arbeitsordner, falls die Datei in einem Unterordner liegt);
+      // ohne bekannten Dateiort wenigstens im Arbeitsordner starten.
+      const startHandle=fileHandle||folderHandle;
+      if(startHandle)opts.startIn=startHandle;
       const handle=await window.showSaveFilePicker(opts);
       await writeToHandle(handle,html);
       fileHandle=handle;

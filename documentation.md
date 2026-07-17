@@ -206,6 +206,24 @@ noch ausschließlich `<input webkitdirectory>` bzw. `<input type=file>`, die kei
   - Dateien außerhalb des Arbeitsordners lösen bewusst weiterhin den Dialog aus – kein stilles Schreiben an unerwarteten Ort
 - Bedienungsanleitung: Abschnitt 12 in „Fall A" (Datei über Arbeitspfad geöffnet → direktes Ersetzen ohne Dialog) und „Fall B" (Datei anders geöffnet → Windows-Dialog, dann gemerkt) aufgeteilt; Abschnitt 2/3 und FAQ ergänzt
 
+### Schritt 22 – „Speichern unter" startet im richtigen Ordner (Juli 2026, Folgefix zu Schritt 21)
+
+Auslöser: Weiteres Praxis-Feedback von Holger Uske. „Speichern unter …" schlug weiterhin den
+Downloads-Ordner als Startort vor, statt im Ordner der offenen Datei zu starten. Ursache: `startIn`
+wurde nur gesetzt, wenn `folderHandle` existierte (also nur nach explizitem „Arbeitspfad festlegen");
+wurde eine Datei per „📂 Öffnen" direkt geladen, blieb `folderHandle` `null` und der Dialog hatte
+keinerlei Ortsangabe.
+
+- **`saveFileAs()`**: `startIn` nutzt jetzt `fileHandle||folderHandle` – das `FileSystemFileHandle`
+  der gerade offenen Datei hat Vorrang, weil die File System Access API bei einem Datei-Handle als
+  `startIn` automatisch im *enthaltenden Ordner* startet (Spec-Verhalten), auch ohne dass je ein
+  Arbeitsordner gesetzt wurde. Das ist zugleich präziser als `folderHandle`, falls die Datei in einem
+  Unterordner des Arbeitspfads liegt (z. B. `verein/pm_….html` bei einem auf Stammebene gesetzten Arbeitspfad).
+- **`openFile()`**: `startIn` nutzt jetzt `folderHandle||fileHandle`, damit ein zweites „Öffnen"
+  ohne Arbeitspfad wenigstens vom zuletzt geöffneten Dateiort startet.
+- Getestet durch gestubbtes `showOpenFilePicker`/`showSaveFilePicker`: Datei ausschließlich über „Öffnen"
+  geladen (kein Arbeitspfad) → `saveFileAs()`-Aufruf übergibt exakt das `fileHandle` der offenen Datei als `startIn`.
+
 ---
 
 ## Begleitend entstandene Dokumente
